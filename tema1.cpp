@@ -14,32 +14,35 @@ public:
     MyString();
 
     /// Constructorul care seteaza sirul nevid
-    MyString(const char *name);
+    MyString(const char *str);
+
+    /// Constructorul de copiere
+    MyString(const MyString &str);
 
     /// Operator overloading pentru afisarea sirului
     friend std::ostream& operator<<(std::ostream& out, const MyString& nume);
 
     /// Dezalocarea memoriei din data []
     ~MyString();
+
     /// Operator overloading pentru copierea stringului
     MyString& operator=(const MyString& str);
-
 };
 
 MyString::MyString() : data(NULL), size(0) {}
 
-MyString::MyString( const char *name) {
-        this->size = strlen(name);
+MyString::MyString( const char *str) {
+        this->size = strlen(str);
         this->data = new char [size];
         for (int i = 0; i < size; i++) {
-            strcpy(data, name);
+            strcpy(data, str);
         }
     }
 MyString& MyString::operator=(const MyString& str) {
     if (this == &str) {
-        return *this;   //protect against self assignment (v = v)
+        return *this;       //protect against self assignment (v = v)
     }
-    delete this->data;  //delete the allocated memory
+    delete this->data;      //delete the allocated memory
     this->data = new char [str.size];
     for (int i = 0; i < str.size; i++) {
         this->data[i] = str.data[i];
@@ -53,10 +56,18 @@ std::ostream& operator<<(std::ostream& out, const MyString& nume) {
         }
     return out;
     }
-MyString::~MyString() {
-    delete [] data;
+MyString::~MyString() { //daca nu e null deja
+    if (data != NULL) {
+        delete[] data;
+    }
 }
-
+MyString::MyString(const MyString &str) {
+    this -> size = str.size;
+    this -> data = str.data;
+    for (int i = 0; i < str.size; i++) {
+        this -> data[i] = str.data[i];
+    }
+}
 /**
  * Clasa Book
  * Aici voi pastra datele pentru fiecare carte sub forma (titlu, editura, autor, gen/categorie, pret)
@@ -70,7 +81,6 @@ class Book{
 public:
       Book();
       Book(const MyString &title1, const MyString &publisher1, const MyString& author1, const MyString& section1, int price1);
-      ~Book();
       /// Operator overloading pentru afisarea obiectului Book
       friend ostream& operator<<(std::ostream& out, const Book& new_book);
 };
@@ -85,8 +95,6 @@ Book::Book(const MyString &title1, const MyString &publisher1, const MyString &a
     price = price1;
 }
 
-Book::~Book() {}
-
 ostream& operator<<(std::ostream& out, const Book& new_book) {
     out << "Titlu: " << new_book.title << endl;
     out << "Editura: " << new_book.publisher << endl;
@@ -100,8 +108,9 @@ ostream& operator<<(std::ostream& out, const Book& new_book) {
 
 class Customer {
     MyString name;
+    MyString client_type; // Efficient/Traditional - clients become efficient if they have more than 2 orders
     Book book;
-    int orders;
+    int nr_of_orders;
     int customer_id;
 };
 

@@ -184,26 +184,69 @@ ostream& operator<<(std::ostream& out, const Customer& new_customer) {
     out << "Nr of orders: " << new_customer.nr_of_orders << endl;
     return out;
 }
+
+
+/** Clasa Employee:
+ * Fiecare angajat va fi inregistrat sub forma: (nume, rol, ID, salary)
+ * */
 class Employee {
     MyString name;
     MyString role;
     int employee_id;
     int salary;
+public:
+    Employee();
+    Employee(int employee_id1, const MyString &name1, const MyString &role1, int salary1);
+    Employee& operator=(const Employee& employee);
+    Employee(const Employee &employee);
+    friend ostream& operator<<(std::ostream& out, const Employee& new_employee);
 };
+Employee::Employee() : employee_id(0), name(NULL), role(NULL), salary(0)  {}
+Employee::Employee(int employee_id1, const MyString &name1, const MyString &role1, int salary1) {
+    employee_id = employee_id1;
+    name = name1;
+    role = role1;
+    salary = salary1;
+}
+Employee& Employee::operator=(const Employee& employee) {
+    if (this == &employee) {
+        return *this;       //protect against self assignment (v = v)
+    }
+    this->employee_id = employee.employee_id;
+    this->name = employee.name;
+    this->role = employee.role;
+    this->salary = employee.salary;
+    return *this;
+}
+Employee::Employee(const Employee &employee) {
+    this->employee_id = employee.employee_id;
+    this->name = employee.name;
+    this->role = employee.role;
+    this->salary = employee.salary;
+}
+ostream& operator<<(std::ostream& out, const Employee& new_employee) {
+    out << "Employee ID: " << new_employee.employee_id << endl;
+    out << "Employee name: " << new_employee.name << endl;
+    out << "Employee role: " << new_employee.role << endl;
+    out << "Employee salary: " << new_employee.salary << " lei" << endl;
+    return out;
+}
 
 class Bookstore {
-    MyString name;
-    MyString address;
-    Book book;
-    Employee employee;
-    Customer customer;
+    MyString name;          // unique
+    MyString address;       // unique
+    Book book;              // a list of books needed
+    Employee employee;      // a list of employees and their roles needed
+    Customer customer;      // a list of customers needed
 };
 
 int main() {
     Book book1("Padurea Spanzuratilor", "Prut", "nume autor", "thriller", 233);
     Customer customer(101, "NUME PRENUME", "TIP CLIENT", book1, 2);
-    cout << book1;
-    cout << customer;
+    Employee employee(201, "N P", "rol", 5000);
+    cout << book1 << endl;
+    cout << customer << endl;
+    cout << employee << endl;
 
     return 0;
 }

@@ -73,19 +73,28 @@ MyString::~MyString() { //daca nu e null deja
  * Clasa Book
  * Aici voi pastra datele pentru fiecare carte sub forma (titlu, editura, autor, gen/categorie, pret)
  * */
-class Book{
+class Book {
     MyString title;
     MyString publisher;
     MyString author;
     MyString section;
     int price;
 public:
-      Book();
-      Book(const MyString &title1, const MyString &publisher1, const MyString& author1, const MyString& section1, int price1);
-      /// Operator overloading pentru afisarea obiectului Book
-      friend ostream& operator<<(std::ostream& out, const Book& new_book);
-      Book(const Book &book);
-      Book& operator=(const Book& book);
+    Book();
+
+    Book(const MyString &title1, const MyString &publisher1, const MyString &author1, const MyString &section1,
+         int price1);
+
+    Book(const MyString &title1, const MyString &author1);
+
+    /// Operator overloading pentru afisarea obiectului Book
+    friend ostream &operator<<(std::ostream &out, const Book &new_book);
+
+    Book(const Book &book);
+
+    Book &operator=(const Book &book);
+
+    Book *getBooks();
 };
 
 Book::Book() : title(NULL), publisher(NULL), author(NULL), section(NULL), price(0) {}
@@ -97,7 +106,10 @@ Book::Book(const MyString &title1, const MyString &publisher1, const MyString &a
     section = section1;
     price = price1;
 }
-
+Book::Book(const MyString &title1, const MyString &author1) {
+    title = title1;
+    author = author1;
+}
 ostream& operator<<(std::ostream& out, const Book& new_book) {
     out << "Titlu: " << new_book.title << endl;
     out << "Editura: " << new_book.publisher << endl;
@@ -125,7 +137,24 @@ Book::Book(const Book &book) {
     this->price = book.price;
 }
 
-
+Book *Book::getBooks() {                    // metoda returneaza o lista de carti de tip Book,
+    int Max_books;                          // cu proprietatile titlu & autor
+    char* titlu;
+    char* autor;
+    cout << "nr carti: " << endl;
+    cin >> Max_books;
+    if (Max_books > 0) {
+        Book* books = new Book[Max_books];
+        for (int i = 0; i < Max_books; i++) {
+            cout << "Book name: " << endl;
+            cin.getline(titlu, 50);
+            cout << "Author name:" << endl;
+            cin.getline(autor, 50);
+            books[i] = Book(titlu, autor);
+        }
+        // continuare ...
+    }
+}
 /**   Clasa Customer:
  * Aici e clasa Customer cu proprietatile: name, client_type, book, nr_of_orders, customer_id
  * */
@@ -158,6 +187,7 @@ Customer::Customer(int customer_id1, const MyString &name1, const MyString &clie
     book = book1;
     nr_of_orders = nr_of_orders1;
 }
+
 Customer::Customer(const Customer& customer) {
     this->customer_id = customer.customer_id;
     this->name = customer.name;
@@ -165,6 +195,7 @@ Customer::Customer(const Customer& customer) {
     this->book = customer.book;
     this->nr_of_orders = customer.nr_of_orders;
 }
+
 Customer& Customer::operator=(const Customer &customer) {
     if (this == &customer) {
         return *this;           // self assignment
@@ -176,6 +207,7 @@ Customer& Customer::operator=(const Customer &customer) {
     this->nr_of_orders = customer.nr_of_orders;
     return *this;
 }
+
 ostream& operator<<(std::ostream& out, const Customer& new_customer) {
     out << "Customer ID: " << new_customer.customer_id << endl;
     out << "Name: " << new_customer.name << endl;
@@ -201,13 +233,16 @@ public:
     Employee(const Employee &employee);
     friend ostream& operator<<(std::ostream& out, const Employee& new_employee);
 };
+
 Employee::Employee() : employee_id(0), name(NULL), role(NULL), salary(0)  {}
+
 Employee::Employee(int employee_id1, const MyString &name1, const MyString &role1, int salary1) {
     employee_id = employee_id1;
     name = name1;
     role = role1;
     salary = salary1;
 }
+
 Employee& Employee::operator=(const Employee& employee) {
     if (this == &employee) {
         return *this;       //protect against self assignment (v = v)
@@ -218,12 +253,14 @@ Employee& Employee::operator=(const Employee& employee) {
     this->salary = employee.salary;
     return *this;
 }
+
 Employee::Employee(const Employee &employee) {
     this->employee_id = employee.employee_id;
     this->name = employee.name;
     this->role = employee.role;
     this->salary = employee.salary;
 }
+
 ostream& operator<<(std::ostream& out, const Employee& new_employee) {
     out << "Employee ID: " << new_employee.employee_id << endl;
     out << "Employee name: " << new_employee.name << endl;

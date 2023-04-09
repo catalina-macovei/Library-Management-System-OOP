@@ -79,11 +79,15 @@ class Book {
     MyString author;
     MyString section;
     int price;
+    Book *books;        // necesara supraincarcrea op =
+    int Max_books;     // nr carti ptr lista
 public:
     Book();
 
     Book(const MyString &title1, const MyString &publisher1, const MyString &author1, const MyString &section1,
          int price1);
+
+    ~Book();
 
     Book(const MyString &title1, const MyString &author1);
 
@@ -118,6 +122,7 @@ ostream& operator<<(std::ostream& out, const Book& new_book) {
     out << "Pret: " << new_book.price << " lei" << endl;
     return out;
 }
+
 Book& Book::operator=(const Book& book) {
     if (this == &book) {
         return *this;       //protect against self assignment (v = v)
@@ -130,29 +135,54 @@ Book& Book::operator=(const Book& book) {
     return *this;
 }
 Book::Book(const Book &book) {
-    this -> title = book.title;
+    this->title = book.title;
     this->publisher = book.publisher;
     this->author = book.author;
     this->section = book.section;
     this->price = book.price;
 }
 
-Book *Book::getBooks() {                    // metoda returneaza o lista de carti de tip Book,
-    int Max_books;                          // cu proprietatile titlu & autor
-    char* titlu;
-    char* autor;
+Book *Book::getBooks() {              // metoda returneaza o lista de carti de tip Book, cu proprietatile titlu & autor
     cout << "nr carti: " << endl;
+    /*
     cin >> Max_books;
+    cin.ignore();
+     */
+    Max_books = 2;
+
     if (Max_books > 0) {
         Book* books = new Book[Max_books];
         for (int i = 0; i < Max_books; i++) {
+            char titlu[50];
+            char autor[50];
+            char editura[50];
+            char gen[20];
+            int pret;
+
             cout << "Book name: " << endl;
             cin.getline(titlu, 50);
             cout << "Author name:" << endl;
             cin.getline(autor, 50);
-            books[i] = Book(titlu, autor);
+            cout << "Publisher name: " << endl;
+            cin.getline(editura,50);
+            cout << "Gender of the book: " << endl;
+            cin.getline(gen, 20);
+            cout << "Price: ";
+            cin >> pret;
+            books[i] = Book(titlu, autor, editura, gen, pret);
+
+            cin.ignore();
         }
-        // continuare ...
+        // continuare ... pentru afisare:
+        for (int i = 0; i < Max_books; i++) {
+            cout << "Cartea " << i + 1 << ": " << endl << books[i] << endl;
+        }
+
+    }
+}
+Book::~Book() {
+    if (books != NULL) {
+        delete [] books;
     }
 }
 /**   Clasa Customer:
@@ -161,13 +191,13 @@ Book *Book::getBooks() {                    // metoda returneaza o lista de cart
 class Customer {
     MyString name;
     MyString client_type; // Efficient/Traditional - clients become efficient if they have more than 2 orders
-    Book book;
+    Book* book;
     int nr_of_orders;
     int customer_id;
 
 public:
     Customer();
-    Customer(int customer_id1, const MyString &name1, const MyString &client_type1, Book book1, int nr_of_orders1);
+    Customer(int customer_id1, const MyString &name1, const MyString &client_type1, Book* book1, int nr_of_orders1);
 
     /// Operator overloading '=' pentru customer
     Customer& operator=(const Customer& customer);
@@ -178,13 +208,13 @@ public:
     /// Operator overloading pentru afisarea obiectului Customer
     friend ostream& operator<<(std::ostream& out, const Customer& new_customer);
 };
-Customer::Customer() : customer_id(0), name(NULL), client_type(NULL), book(), nr_of_orders(0){}
+Customer::Customer() : customer_id(0), name(NULL), client_type(NULL), book(NULL), nr_of_orders(0){}
 
-Customer::Customer(int customer_id1, const MyString &name1, const MyString &client_type1, Book book1, int nr_of_orders1) {
+Customer::Customer(int customer_id1, const MyString &name1, const MyString &client_type1, Book* book1, int nr_of_orders1) {
     customer_id = customer_id1;
     name = name1;
     client_type = client_type1;
-    book = book1;
+    book = book1->getBooks();
     nr_of_orders = nr_of_orders1;
 }
 
@@ -278,9 +308,12 @@ class Bookstore {
 };
 
 int main() {
+    Book* books;
     Book book1("Padurea Spanzuratilor", "Prut", "nume autor", "thriller", 233);
-    Customer customer(101, "NUME PRENUME", "TIP CLIENT", book1, 2);
+    Book book("xax", "xax");            // initializare
+    Customer customer(101, "NUME PRENUME", "TIP CLIENT", books, 2);
     Employee employee(201, "N P", "rol", 5000);
+
     cout << book1 << endl;
     cout << customer << endl;
     cout << employee << endl;

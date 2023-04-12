@@ -6,6 +6,7 @@ using namespace std;
  * Clasa care retine un sir de caractere alocat dinamic,
  * adica un pointer la un tablou unidimensional de char, alocat dinamic
  * */
+
 class MyString {
     int size;
     char *data;
@@ -22,6 +23,7 @@ public:
     /// Operator overloading pentru afisarea sirului
     friend std::ostream& operator<<(std::ostream& out, const MyString& nume);
 
+    /// Operator overloading pentru citirea sirului
     friend istream& operator>>(std::istream& is, MyString& str);
 
     /// Dezalocarea memoriei din data []
@@ -43,18 +45,18 @@ MyString::MyString( const char *str) {
     }
 MyString& MyString::operator=(const MyString& str) {
     if (this == &str) {
-        return *this;       //protect against self assignment (v = v)
+        return *this;                       //protect against self assignment (v = v)
     }
-    //delete [] data;      //delete the allocated memory
+    delete [] data;                         //delete the allocated memory          !!!!!!
     this->data = new char [str.size + 1];
     strncpy(this->data, str.data, str.size);
     this->size = str.size;
     this->data[size] = '\0';
     return *this;
 }
-std::ostream& operator<<(std::ostream& out, const MyString& nume) {
-        for (int i = 0; i < nume.size; i++) {
-            out << nume.data[i];
+std::ostream& operator<<(std::ostream& out, const MyString& str) {
+        for (int i = 0; i < str.size; i++) {
+            out << str.data[i];
         }
     return out;
     }
@@ -67,7 +69,8 @@ std::istream& operator>>(std::istream& is, MyString& str) {
 MyString::MyString(const MyString &str) {
     this->data = new char [str.size + 1];
     strncpy(this->data, str.data, str.size);
-    //this->data[size] = '\0';
+    this->size = str.size;
+    this->data[size] = '\0';
 }
 
 MyString::~MyString() { //daca nu e null deja
@@ -81,48 +84,29 @@ MyString::~MyString() { //daca nu e null deja
  * Aici voi pastra datele pentru fiecare carte sub forma (titlu, editura, autor, gen/categorie, pret)
  * */
 class Book {
-    char* title;
-    char* author;
+    MyString title;
+    MyString author;
     int price;
 public:
     Book();
 
-    Book(const char *title1, const char *author1, int price1);
+    Book(const MyString title1, const MyString author1, int price1);
 
     friend ostream &operator<<(ostream &out, const Book &new_book);
 
     Book(const Book &book);
 
-    ~Book();
-
     Book &operator=(const Book &book);
 };
 
-Book::Book()  {
-    title = new char [10];
-    strcpy(title, "ABCDF FFFF");
-    author = new char[10];
-    strcpy(author, "Anna Todd");
-    price = 100;
-}
-Book::~Book() {
-    if (title != NULL) {
-        delete [] title;
-    }
-    if (author != NULL) {
-        delete [] author;
-    }
-}
-Book::Book(const char *title1, const char *author1, int price1) : price(price1){
-    title = new char [strlen(title1) + 1];
-    strcpy(title, title1);
-    author = new char [::strlen(author1) + 1];
-    strcpy(author, author1);
-}
+Book::Book() : title(NULL), author(NULL)  {}
+
+Book::Book(const MyString title1, const MyString author1, int price1) : price(price1), title(title1), author(author1){}
+
 ostream& operator<<(ostream& out, const Book& book) {
-    out << "Titlu: " << book.title << endl;
-    out << "Autor: " << book.author << endl;
-    out << "Pret: " << book.price << " lei" << endl;
+    out << "Title: " << book.title << endl;
+    out << "Author: " << book.author << endl;
+    out << "Price: " << book.price << " lei" << endl;
     return out;
 }
 
@@ -131,20 +115,14 @@ Book& Book::operator=(const Book& book) {
     if (this == &book) {
         return *this;       //protect against self assignment (v = v)
     }
-    title  = new char[strlen(book.title)];
-    strncpy(this->title, book.title, strlen(book.title));
-    author  = new char[strlen(book.author)];
-    strncpy(this->author, book.author, strlen(book.author));
-
+    this->title = book.title;
+    this->author = book.author;
     this->price = book.price;
     return *this;
 }
 Book::Book(const Book& book) {
-    title  = new char[strlen(book.title)];
-    strncpy(this->title, book.title, strlen(book.title));
-    author  = new char[strlen(book.author)];
-    strncpy(this->author, book.author, strlen(book.author));
-
+    this->title = book.title;
+    this->author = book.author;
     this->price = book.price;
 }
 /**   Clasa Customer:
@@ -291,7 +269,7 @@ Bookstore::Bookstore(const MyString& name1, const MyString& address1, int books_
     address = address1;
     employee = employee1;
     customer = customer1;
-    cout << "nr carti: " << endl;
+    cout << "books number: " << endl;
     cin >> books_number1;
     books_number = books_number1;
     cin.ignore();
@@ -299,16 +277,16 @@ Bookstore::Bookstore(const MyString& name1, const MyString& address1, int books_
     if (books_number > 0) {
         books = new Book[books_number];
         for (int i = 0; i < books_number; i++) {
-            char titlu[30];
-            char autor[30];
-            int pret;
+            char title[30];
+            char author[30];
+            int price;
             cout << "Book name: " << endl;
-            cin.getline(titlu, 30);
+            cin.getline(title, 30);
             cout << "Author name:" << endl;
-            cin.getline(autor, 30);
+            cin.getline(author, 30);
             cout << "Price: ";
-            cin >> pret;
-            books[i] = Book(titlu, autor, pret);
+            cin >> price;
+            books[i] = Book(title, author, price);
 
             cin.ignore();
         }
@@ -336,12 +314,15 @@ Bookstore& Bookstore::operator=(const Bookstore& bookstore) {
 }
 ostream& operator<<(std::ostream& out, const Bookstore& new_bookstore) {
     out << "Bookstore name: " << new_bookstore.name << endl;
-    out << "Bookstore address: " << new_bookstore.address << endl;
-    out << "Bookstore employee list: " << new_bookstore.employee << endl;
-    out << "Bookstore customer list: " << new_bookstore.customer << endl;
-    out << "Bookstore books list: " << "books number: " << new_bookstore.books_number << endl;
+    out << "Bookstore address: " << new_bookstore.address << "\n\n";
+    out << "Bookstore employee list: " << endl;
+    out << new_bookstore.employee << endl;
+    out << "Bookstore customer list: " << endl;
+    out << new_bookstore.customer << endl;
+    out << "In stock you've introduced " << new_bookstore.books_number << " books: " << endl;
     for (int i = 0; i < new_bookstore.books_number; i++) {
-        out << i + 1 << ". " << new_bookstore.books[i] << endl;
+        out << "Book " << i + 1 << ":" << endl;
+        out << new_bookstore.books[i] << endl;
     }
     return out;
 }

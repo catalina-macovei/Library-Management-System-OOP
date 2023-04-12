@@ -22,6 +22,8 @@ public:
     /// Operator overloading pentru afisarea sirului
     friend std::ostream& operator<<(std::ostream& out, const MyString& nume);
 
+    friend istream& operator>>(std::istream& is, MyString& str);
+
     /// Dezalocarea memoriei din data []
     ~MyString();
 
@@ -56,11 +58,16 @@ std::ostream& operator<<(std::ostream& out, const MyString& nume) {
         }
     return out;
     }
-
+std::istream& operator>>(std::istream& is, MyString& str) {
+    str.size = 50;
+    str.data = new char [50];
+    is.getline(str.data, 50);
+    return  is;
+}
 MyString::MyString(const MyString &str) {
     this->data = new char [str.size + 1];
     strncpy(this->data, str.data, str.size);
-    this->data[size] = '\0';
+    //this->data[size] = '\0';
 }
 
 MyString::~MyString() { //daca nu e null deja
@@ -73,73 +80,85 @@ MyString::~MyString() { //daca nu e null deja
  * Clasa Book
  * Aici voi pastra datele pentru fiecare carte sub forma (titlu, editura, autor, gen/categorie, pret)
  * */
-class Book{
-    MyString title;
-    MyString publisher;
-    MyString author;
-    MyString section;
+class Book {
+    char* title;
+    char* author;
     int price;
 public:
-      Book();
-      Book(const MyString &title1, const MyString &publisher1, const MyString& author1, const MyString& section1, int price1);
-      /// Operator overloading pentru afisarea obiectului Book
-      friend ostream& operator<<(std::ostream& out, const Book& new_book);
-      Book(const Book &book);
-      Book& operator=(const Book& book);
+    Book();
+
+    Book(const char *title1, const char *author1, int price1);
+
+    friend ostream &operator<<(ostream &out, const Book &new_book);
+
+    Book(const Book &book);
+
+    ~Book();
+
+    Book &operator=(const Book &book);
 };
 
-Book::Book() : title(NULL), publisher(NULL), author(NULL), section(NULL), price(0) {}
-
-Book::Book(const MyString &title1, const MyString &publisher1, const MyString &author1, const MyString &section1, int price1) {
-    title = title1;
-    publisher = publisher1;
-    author = author1;
-    section = section1;
-    price = price1;
+Book::Book()  {
+    title = new char [10];
+    strcpy(title, "ABCDF FFFF");
+    author = new char[10];
+    strcpy(author, "Anna Todd");
+    price = 100;
 }
-
-ostream& operator<<(std::ostream& out, const Book& new_book) {
-    out << "Titlu: " << new_book.title << endl;
-    out << "Editura: " << new_book.publisher << endl;
-    out << "Autor: " << new_book.author << endl;
-    out << "Gen: " << new_book.section << endl;
-    out << "Pret: " << new_book.price << " lei" << endl;
+Book::~Book() {
+    if (title != NULL) {
+        delete [] title;
+    }
+    if (author != NULL) {
+        delete [] author;
+    }
+}
+Book::Book(const char *title1, const char *author1, int price1) : price(price1){
+    title = new char [strlen(title1) + 1];
+    strcpy(title, title1);
+    author = new char [::strlen(author1) + 1];
+    strcpy(author, author1);
+}
+ostream& operator<<(ostream& out, const Book& book) {
+    out << "Titlu: " << book.title << endl;
+    out << "Autor: " << book.author << endl;
+    out << "Pret: " << book.price << " lei" << endl;
     return out;
 }
+
+
 Book& Book::operator=(const Book& book) {
     if (this == &book) {
         return *this;       //protect against self assignment (v = v)
     }
-    this->title = book.title;
-    this->publisher = book.publisher;
-    this->author = book.author;
-    this->section = book.section;
+    title  = new char[strlen(book.title)];
+    strncpy(this->title, book.title, strlen(book.title));
+    author  = new char[strlen(book.author)];
+    strncpy(this->author, book.author, strlen(book.author));
+
     this->price = book.price;
     return *this;
 }
-Book::Book(const Book &book) {
-    this -> title = book.title;
-    this->publisher = book.publisher;
-    this->author = book.author;
-    this->section = book.section;
+Book::Book(const Book& book) {
+    title  = new char[strlen(book.title)];
+    strncpy(this->title, book.title, strlen(book.title));
+    author  = new char[strlen(book.author)];
+    strncpy(this->author, book.author, strlen(book.author));
+
     this->price = book.price;
 }
-
-
 /**   Clasa Customer:
  * Aici e clasa Customer cu proprietatile: name, client_type, book, nr_of_orders, customer_id
  * */
 class Customer {
     MyString name;
     MyString client_type; // Efficient/Traditional - clients become efficient if they have more than 2 orders
-    Book book;
     int nr_of_orders;
     int customer_id;
 
 public:
     Customer();
-    Customer(int customer_id1, const MyString &name1, const MyString &client_type1, Book book1, int nr_of_orders1);
-
+    Customer(int customer_id1, const MyString &name1, const MyString &client_type1, int nr_of_orders1);
     /// Operator overloading '=' pentru customer
     Customer& operator=(const Customer& customer);
 
@@ -149,22 +168,22 @@ public:
     /// Operator overloading pentru afisarea obiectului Customer
     friend ostream& operator<<(std::ostream& out, const Customer& new_customer);
 };
-Customer::Customer() : customer_id(0), name(NULL), client_type(NULL), book(), nr_of_orders(0){}
+Customer::Customer() : customer_id(0), name(NULL), client_type(NULL), nr_of_orders(0){}
 
-Customer::Customer(int customer_id1, const MyString &name1, const MyString &client_type1, Book book1, int nr_of_orders1) {
+Customer::Customer(int customer_id1, const MyString &name1, const MyString &client_type1, int nr_of_orders1) {
     customer_id = customer_id1;
     name = name1;
     client_type = client_type1;
-    book = book1;
     nr_of_orders = nr_of_orders1;
 }
+
 Customer::Customer(const Customer& customer) {
     this->customer_id = customer.customer_id;
     this->name = customer.name;
     this->client_type = customer.client_type;
-    this->book = customer.book;
     this->nr_of_orders = customer.nr_of_orders;
 }
+
 Customer& Customer::operator=(const Customer &customer) {
     if (this == &customer) {
         return *this;           // self assignment
@@ -172,15 +191,15 @@ Customer& Customer::operator=(const Customer &customer) {
     this->customer_id = customer.customer_id;
     this->name = customer.name;
     this->client_type = customer.client_type;
-    this->book = customer.book;
     this->nr_of_orders = customer.nr_of_orders;
     return *this;
 }
+
 ostream& operator<<(std::ostream& out, const Customer& new_customer) {
     out << "Customer ID: " << new_customer.customer_id << endl;
     out << "Name: " << new_customer.name << endl;
     out << "Client type: " << new_customer.client_type << endl;
-    out << "Book: " << new_customer.book << endl;
+    //out << "Book: " << new_customer.book << endl;
     out << "Nr of orders: " << new_customer.nr_of_orders << endl;
     return out;
 }
@@ -201,13 +220,16 @@ public:
     Employee(const Employee &employee);
     friend ostream& operator<<(std::ostream& out, const Employee& new_employee);
 };
+
 Employee::Employee() : employee_id(0), name(NULL), role(NULL), salary(0)  {}
+
 Employee::Employee(int employee_id1, const MyString &name1, const MyString &role1, int salary1) {
     employee_id = employee_id1;
     name = name1;
     role = role1;
     salary = salary1;
 }
+
 Employee& Employee::operator=(const Employee& employee) {
     if (this == &employee) {
         return *this;       //protect against self assignment (v = v)
@@ -218,12 +240,14 @@ Employee& Employee::operator=(const Employee& employee) {
     this->salary = employee.salary;
     return *this;
 }
+
 Employee::Employee(const Employee &employee) {
     this->employee_id = employee.employee_id;
     this->name = employee.name;
     this->role = employee.role;
     this->salary = employee.salary;
 }
+
 ostream& operator<<(std::ostream& out, const Employee& new_employee) {
     out << "Employee ID: " << new_employee.employee_id << endl;
     out << "Employee name: " << new_employee.name << endl;
@@ -235,19 +259,113 @@ ostream& operator<<(std::ostream& out, const Employee& new_employee) {
 class Bookstore {
     MyString name;          // unique
     MyString address;       // unique
-    Book book;              // a list of books needed
+    Book *books;             // a list of books needed
+    int books_number;
     Employee employee;      // a list of employees and their roles needed
     Customer customer;      // a list of customers needed
+public:
+    Bookstore();
+
+    Bookstore(const MyString& name1, const MyString& address1,int books_number1, const Employee& employee1, const Customer& customer1);
+
+    ~Bookstore();
+
+    Bookstore &operator=(const Bookstore &bookstore);
+
+    friend ostream &operator<<(std::ostream &out, const Bookstore &new_bookstore);
+
+    Bookstore(const Bookstore& another_bookstore);
 };
+Bookstore::Bookstore() : name(NULL), address(NULL), books(NULL), books_number(0), employee(), customer() {}
+
+Bookstore::~Bookstore() {
+    if (books != NULL) {
+        delete [] books;
+    }
+}
+
+Bookstore::Bookstore(const MyString& name1, const MyString& address1, int books_number1, const Employee& employee1, const Customer& customer1) :
+    name(name1), address(address1), employee(employee1), customer(customer1), books_number(books_number1), books(NULL)
+{
+    name = name1;
+    address = address1;
+    employee = employee1;
+    customer = customer1;
+    cout << "nr carti: " << endl;
+    cin >> books_number1;
+    books_number = books_number1;
+    cin.ignore();
+
+    if (books_number > 0) {
+        books = new Book[books_number];
+        for (int i = 0; i < books_number; i++) {
+            char titlu[30];
+            char autor[30];
+            int pret;
+            cout << "Book name: " << endl;
+            cin.getline(titlu, 30);
+            cout << "Author name:" << endl;
+            cin.getline(autor, 30);
+            cout << "Price: ";
+            cin >> pret;
+            books[i] = Book(titlu, autor, pret);
+
+            cin.ignore();
+        }
+        }
+}
+
+Bookstore& Bookstore::operator=(const Bookstore& bookstore) {
+    if (this == &bookstore) {
+        return *this;
+    }
+
+    this->name = bookstore.name;
+    this->address = bookstore.address;
+    this->employee = bookstore.employee;
+    this->customer = bookstore.customer;
+    this->books_number = bookstore.books_number;
+
+    if (books_number > 0) {
+        books = new Book[books_number];
+        for (int i = 0; i < books_number; i++) {
+            this->books[i] = bookstore.books[i];
+        }
+    }
+    return *this;
+}
+ostream& operator<<(std::ostream& out, const Bookstore& new_bookstore) {
+    out << "Bookstore name: " << new_bookstore.name << endl;
+    out << "Bookstore address: " << new_bookstore.address << endl;
+    out << "Bookstore employee list: " << new_bookstore.employee << endl;
+    out << "Bookstore customer list: " << new_bookstore.customer << endl;
+    out << "Bookstore books list: " << "books number: " << new_bookstore.books_number << endl;
+    for (int i = 0; i < new_bookstore.books_number; i++) {
+        out << i + 1 << ". " << new_bookstore.books[i] << endl;
+    }
+    return out;
+}
+Bookstore::Bookstore(const Bookstore& another_bookstore) {
+    this->name = another_bookstore.name;
+    this->address = another_bookstore.address;
+    this->employee = another_bookstore.employee;
+    this->customer = another_bookstore.customer;
+    this->books_number = another_bookstore.books_number;
+
+    if (books_number > 0) {
+        books = new Book[books_number];
+        for (int i = 0; i < books_number; i++) {
+            books[i] = another_bookstore.books[i];
+        }
+    }
+}
 
 int main() {
-    Book book1("Padurea Spanzuratilor", "Prut", "nume autor", "thriller", 233);
-    Customer customer(101, "NUME PRENUME", "TIP CLIENT", book1, 2);
+    Book  book1("Padurea Spanzuratilor", "Prut", 233);
+    Customer customer(101, "NUME PRENUME", "TIP CLIENT", 2);
     Employee employee(201, "N P", "rol", 5000);
-    cout << book1 << endl;
-    cout << customer << endl;
-    cout << employee << endl;
+    Bookstore bookstore("nume librarie", "adresa", 2, employee, customer);
+    cout << bookstore;
 
     return 0;
 }
-//int customer_id1, const MyString &name1, const MyString &client_type1, Book* book1, int nr_of_orders1

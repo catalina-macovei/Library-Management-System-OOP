@@ -232,6 +232,24 @@ public:
     Employee(const Employee &employee);
 
     friend ostream& operator<<(std::ostream& out, const Employee& new_employee);
+
+    /// Getters down here!
+    int getId()  const;
+
+    const MyString getName() const;
+
+    const MyString getRole() const;
+
+    int getSalary() const;
+
+    /// Setters down here!
+    void setName(const MyString name_set);
+
+    void setRole(const MyString role_set);
+
+    void setSalary(int salary_set);
+
+    void setId(int id_set);
 };
 
 Employee::Employee() : employee_id(0), name(NULL), role(NULL), salary(0)  {}

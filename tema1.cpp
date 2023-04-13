@@ -6,7 +6,6 @@ using namespace std;
  * Clasa care retine un sir de caractere alocat dinamic,
  * adica un pointer la un tablou unidimensional de char, alocat dinamic
  * */
-
 class MyString {
     int size;
     char *data;
@@ -47,7 +46,9 @@ MyString& MyString::operator=(const MyString& str) {
     if (this == &str) {
         return *this;                       //protect against self assignment (v = v)
     }
-    delete [] data;                         //delete the allocated memory          !!!!!!
+    if (data != NULL) {
+        delete [] data;                     //delete the allocated memory          !!!!!!
+    }
     this->data = new char [str.size + 1];
     strncpy(this->data, str.data, str.size);
     this->size = str.size;
@@ -79,6 +80,7 @@ MyString::~MyString() { //daca nu e null deja
     }
 }
 
+
 /**
  * Clasa Book
  * Aici voi pastra datele pentru fiecare carte sub forma (titlu, editura, autor, gen/categorie, pret)
@@ -97,11 +99,25 @@ public:
     Book(const Book &book);
 
     Book &operator=(const Book &book);
+
+    /// Getters down here!
+    const MyString getTitle()  const;
+
+    const MyString getAuthor() const;
+
+    int getPrice() const;
+
+    /// Setters down here!
+    void setTitle(const MyString title_set);
+
+    void setAuthor(const MyString author_set);
+
+    void setPrice(int price_set);
 };
 
 Book::Book() : title(NULL), author(NULL)  {}
 
-Book::Book(const MyString title1, const MyString author1, int price1) : price(price1), title(title1), author(author1){}
+Book::Book(const MyString title1, const MyString author1, int price1) : price(price1), title(title1), author(author1) {}
 
 ostream& operator<<(ostream& out, const Book& book) {
     out << "Title: " << book.title << endl;
@@ -109,8 +125,6 @@ ostream& operator<<(ostream& out, const Book& book) {
     out << "Price: " << book.price << " lei" << endl;
     return out;
 }
-
-
 Book& Book::operator=(const Book& book) {
     if (this == &book) {
         return *this;       //protect against self assignment (v = v)
@@ -125,28 +139,48 @@ Book::Book(const Book& book) {
     this->author = book.author;
     this->price = book.price;
 }
+const MyString Book::getTitle() const {
+    return title;
+}
+const MyString Book::getAuthor() const {
+    return author;
+}
+int Book::getPrice() const {
+    return price;
+}
+void Book::setTitle(const MyString title_set) {
+    title = title_set;
+}
+void Book::setAuthor(const MyString author_set) {
+    author = author_set;
+}
+void Book::setPrice(int price_set) {
+    price = price_set;
+}
+
+
+
 /**   Clasa Customer:
  * Aici e clasa Customer cu proprietatile: name, client_type, book, nr_of_orders, customer_id
  * */
 class Customer {
     MyString name;
-    MyString client_type; // Efficient/Traditional - clients become efficient if they have more than 2 orders
+    MyString client_type;           // Efficient/Traditional - clients become efficient if they have more than 2 orders
     int nr_of_orders;
     int customer_id;
 
 public:
     Customer();
+
     Customer(int customer_id1, const MyString &name1, const MyString &client_type1, int nr_of_orders1);
-    /// Operator overloading '=' pentru customer
+
     Customer& operator=(const Customer& customer);
 
-    /// Copy constructor down here:
     Customer(const Customer& customer);
 
-    /// Operator overloading pentru afisarea obiectului Customer
     friend ostream& operator<<(std::ostream& out, const Customer& new_customer);
 };
-Customer::Customer() : customer_id(0), name(NULL), client_type(NULL), nr_of_orders(0){}
+Customer::Customer() : customer_id(0), name(NULL), client_type(NULL), nr_of_orders(0) {}
 
 Customer::Customer(int customer_id1, const MyString &name1, const MyString &client_type1, int nr_of_orders1) {
     customer_id = customer_id1;
@@ -154,14 +188,12 @@ Customer::Customer(int customer_id1, const MyString &name1, const MyString &clie
     client_type = client_type1;
     nr_of_orders = nr_of_orders1;
 }
-
 Customer::Customer(const Customer& customer) {
     this->customer_id = customer.customer_id;
     this->name = customer.name;
     this->client_type = customer.client_type;
     this->nr_of_orders = customer.nr_of_orders;
 }
-
 Customer& Customer::operator=(const Customer &customer) {
     if (this == &customer) {
         return *this;           // self assignment
@@ -172,7 +204,6 @@ Customer& Customer::operator=(const Customer &customer) {
     this->nr_of_orders = customer.nr_of_orders;
     return *this;
 }
-
 ostream& operator<<(std::ostream& out, const Customer& new_customer) {
     out << "Customer ID: " << new_customer.customer_id << endl;
     out << "Name: " << new_customer.name << endl;
@@ -190,11 +221,16 @@ class Employee {
     MyString role;
     int employee_id;
     int salary;
+
 public:
     Employee();
+
     Employee(int employee_id1, const MyString &name1, const MyString &role1, int salary1);
+
     Employee& operator=(const Employee& employee);
+
     Employee(const Employee &employee);
+
     friend ostream& operator<<(std::ostream& out, const Employee& new_employee);
 };
 
@@ -238,13 +274,15 @@ class Bookstore {
     MyString address;
     Book *books;
     int books_number;
-    Employee employee;      // a list of employees and their roles needed
+    Employee *employee;      // a list of employees and their roles needed
+    int employee_number;
     Customer *customer;
-    int customer_number;    // a list of customers needed
+    int customer_number;
+
 public:
     Bookstore();
 
-    Bookstore(const MyString& name1, const MyString& address1,int books_number1, const Employee& employee1, int customer_number);
+    Bookstore(const MyString& name1, const MyString& address1,int books_number1, int employee_number1, int customer_number1);
 
     ~Bookstore();
 
@@ -254,7 +292,7 @@ public:
 
     Bookstore(const Bookstore& another_bookstore);
 };
-Bookstore::Bookstore() : name(NULL), address(NULL), books(NULL), books_number(0), employee(), customer(NULL), customer_number(0) {}
+Bookstore::Bookstore() : name(NULL), address(NULL), books(NULL), books_number(0), employee(NULL), employee_number(0), customer(NULL), customer_number(0) {}
 
 Bookstore::~Bookstore() {
     if (books != NULL) {
@@ -263,14 +301,43 @@ Bookstore::~Bookstore() {
     if (customer != NULL) {
         delete [] customer;
     }
+    if (employee != NULL) {
+        delete [] employee;
+    }
 }
 
-Bookstore::Bookstore(const MyString& name1, const MyString& address1, int books_number1, const Employee& employee1, int customer_number1)
-:   name(name1), address(address1), employee(employee1), customer(NULL), books_number(books_number1), books(NULL), customer_number(customer_number1)
+Bookstore::Bookstore(const MyString& name1, const MyString& address1,int books_number1, int employee_number1, int customer_number1)
+:   name(name1), address(address1), employee(NULL), employee_number(employee_number1), customer(NULL), books_number(books_number1), books(NULL), customer_number(customer_number1)
     {
         name = name1;
         address = address1;
-        employee = employee1;
+
+        cout << "Employees number: " << endl;
+        cin >> employee_number1;
+        employee_number = employee_number1;
+        cin.ignore();
+
+        if (employee_number > 0) {
+            employee = new Employee[employee_number];
+            for (int i = 0; i < employee_number; i++) {
+                char name[30];
+                char role[30];
+                int id;
+                int salary;
+
+                cout << "Employee's name: " << endl;
+                cin.getline(name, 30);
+                cout << "Employee's role:" << endl;
+                cin.getline(role, 30);
+                cout << "Employee ID: ";
+                cin >> id;
+                cout << "Salary: " << endl;
+                cin >> salary;
+
+                employee[i] = Employee(id, name, role, salary);
+                cin.ignore();
+            }
+        }
 
         cout << "Customers number: " << endl;
         cin >> customer_number1;
@@ -325,13 +392,35 @@ Bookstore& Bookstore::operator=(const Bookstore& bookstore) {
     if (this == &bookstore) {
         return *this;
     }
-
     this->name = bookstore.name;
     this->address = bookstore.address;
-    this->employee = bookstore.employee;
-    this->customer = bookstore.customer;
+    this->employee_number = bookstore.employee_number;
     this->books_number = bookstore.books_number;
+    this->customer_number = bookstore.customer_number;
 
+    if (employee != NULL) {
+        delete [] employee;
+    }
+    if (employee_number > 0) {
+        employee = new Employee[employee_number];
+        for (int i = 0; i < employee_number; i++) {
+            this->employee[i] = bookstore.employee[i];
+        }
+    }
+
+    if (customer != NULL) {
+        delete [] customer;
+    }
+    if (customer_number > 0) {
+        customer = new Customer[customer_number];
+        for (int i = 0; i < customer_number; i++) {
+            this->customer[i] = bookstore.customer[i];
+        }
+    }
+
+    if (books != NULL) {
+        delete [] books;
+    }
     if (books_number > 0) {
         books = new Book[books_number];
         for (int i = 0; i < books_number; i++) {
@@ -342,10 +431,14 @@ Bookstore& Bookstore::operator=(const Bookstore& bookstore) {
 }
 ostream& operator<<(std::ostream& out, const Bookstore& new_bookstore) {
     out << "Bookstore name: " << new_bookstore.name << endl;
-    out << "Bookstore address: " << new_bookstore.address << "\n\n";
-    out << "Bookstore employee list: " << endl;
-    out << new_bookstore.employee << endl;
-    out << "You've introduced " << new_bookstore.customer_number << " customers successfully!" << endl;
+    out << "Bookstore address: " << new_bookstore.address << endl;
+
+    out << "\n\nYou've introduced " << new_bookstore.employee_number << " employees successfully!" << endl;
+    for (int i = 0; i < new_bookstore.employee_number; i++) {
+        out << "Employee " << i + 1 << ":" << endl;
+        out << new_bookstore.employee[i] << endl;
+    }
+    out << "\n\nYou've introduced " << new_bookstore.customer_number << " customers successfully!" << endl;
     for (int i = 0; i < new_bookstore.customer_number; i++) {
         out << "Customer " << i + 1 << ":" << endl;
         out << new_bookstore.customer[i] << endl;
@@ -360,10 +453,22 @@ ostream& operator<<(std::ostream& out, const Bookstore& new_bookstore) {
 Bookstore::Bookstore(const Bookstore& another_bookstore) {
     this->name = another_bookstore.name;
     this->address = another_bookstore.address;
-    this->employee = another_bookstore.employee;
-    this->customer = another_bookstore.customer;
+    this->employee_number = another_bookstore.employee_number;
+    this->customer_number = another_bookstore.customer_number;
     this->books_number = another_bookstore.books_number;
 
+    if (employee_number > 0) {
+        employee = new Employee[employee_number];
+        for (int i = 0; i < employee_number; i++) {
+            employee[i] = another_bookstore.employee[i];
+        }
+    }
+    if (customer_number > 0) {
+        customer = new Customer[customer_number];
+        for (int i = 0; i < customer_number; i++) {
+            customer[i] = another_bookstore.customer[i];
+        }
+    }
     if (books_number > 0) {
         books = new Book[books_number];
         for (int i = 0; i < books_number; i++) {
@@ -376,7 +481,7 @@ int main() {
     Book  book1("Padurea Spanzuratilor", "Prut", 233);
     Customer customer(101, "NUME PRENUME", "TIP CLIENT", 2);
     Employee employee(201, "N P", "rol", 5000);
-    Bookstore bookstore("nume librarie", "adresa", 2, employee, 2);
+    Bookstore bookstore("nume librarie", "adresa", 0, 0, 0);
     cout << bookstore;
 
     return 0;

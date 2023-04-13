@@ -44,7 +44,7 @@ MyString::MyString( const char *str) {
     }
 MyString& MyString::operator=(const MyString& str) {
     if (this == &str) {
-        return *this;                       //protect against self assignment (v = v)
+        return *this;                       //protect against self assignment (str = str)
     }
     if (data != NULL) {
         delete [] data;                     //delete the allocated memory          !!!!!!
@@ -127,7 +127,7 @@ ostream& operator<<(ostream& out, const Book& book) {
 }
 Book& Book::operator=(const Book& book) {
     if (this == &book) {
-        return *this;       //protect against self assignment (v = v)
+        return *this;       //protect against self assignment (book = book)
     }
     this->title = book.title;
     this->author = book.author;
@@ -161,7 +161,7 @@ void Book::setPrice(int price_set) {
 
 
 /**   Clasa Customer:
- * Aici e clasa Customer cu proprietatile: name, client_type, book, nr_of_orders, customer_id
+ * Aici e clasa Customer cu proprietatile: name, client_type, nr_of_orders, customer_id
  * */
 class Customer {
     MyString name;
@@ -335,6 +335,12 @@ public:
     friend ostream &operator<<(std::ostream &out, const Bookstore &new_bookstore);
 
     Bookstore(const Bookstore& another_bookstore);
+
+    /// Bussiness methods down here:
+    double mediumSalary();
+
+    double mediumPrice();
+
 };
 Bookstore::Bookstore() : name(NULL), address(NULL), books(NULL), books_number(0), employee(NULL), employee_number(0), customer(NULL), customer_number(0) {}
 
@@ -521,7 +527,21 @@ Bookstore::Bookstore(const Bookstore& another_bookstore) {
         }
     }
 }
+double Bookstore::mediumSalary() {
+    double med_sum = 0;
+    for (int i = 0; i < employee_number; i++) {
+        med_sum += employee[i].getSalary();
+    }
+    return med_sum / employee_number;
+}
 
+double Bookstore::mediumPrice() {
+    double med_price = 0;
+    for (int i = 0; i < books_number; i++) {
+        med_price += books[i].getPrice();
+    }
+    return med_price / books_number;
+}
 int main() {
     Book  book1("Padurea Spanzuratilor", "Prut", 233);
     Customer customer(101, "NUME PRENUME", "TIP CLIENT", 2);
@@ -529,6 +549,8 @@ int main() {
 
     Bookstore bookstore("nume librarie", "adresa", 0, 0, 0);
     cout << bookstore;
+    cout << "\nPretul mediu books: " << bookstore.mediumPrice() << endl;
+    cout << "Salariu mediu employees: " << bookstore.mediumSalary() << endl;
 
     return 0;
 }

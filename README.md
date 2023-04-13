@@ -1,2 +1,2 @@
-# :books: Library Management System
+# :books: Bookstore Management System
 

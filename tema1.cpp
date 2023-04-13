@@ -286,6 +286,32 @@ ostream& operator<<(std::ostream& out, const Employee& new_employee) {
     out << "Employee salary: " << new_employee.salary << " lei" << endl;
     return out;
 }
+int Employee::getId() const {
+    return employee_id;
+}
+const MyString Employee::getName() const {
+    return name;
+}
+const MyString Employee::getRole() const {
+    return role;
+}
+int Employee::getSalary() const {
+    return salary;
+}
+void Employee::setName(const MyString name_set) {
+    name = name_set;
+}
+void Employee::setRole(const MyString role_set) {
+    role = role_set;
+}
+void Employee::setSalary(int salary_set) {
+    salary = salary_set;
+}
+void Employee::setId(int id_set) {
+    employee_id = id_set;
+}
+
+
 
 class Bookstore {
     MyString name;
@@ -448,20 +474,21 @@ Bookstore& Bookstore::operator=(const Bookstore& bookstore) {
     return *this;
 }
 ostream& operator<<(std::ostream& out, const Bookstore& new_bookstore) {
-    out << "Bookstore name: " << new_bookstore.name << endl;
-    out << "Bookstore address: " << new_bookstore.address << endl;
+    out << "\n\n-------------------   BOOKSTORE  STAGE: < completed >    ----------------------" << endl;
+    out << "\n\nBookstore name: " << new_bookstore.name << endl;
+    out << "\nBookstore address: " << new_bookstore.address << endl;
 
-    out << "\n\nYou've introduced " << new_bookstore.employee_number << " employees successfully!" << endl;
+    out << "\nYou've introduced " << new_bookstore.employee_number << " employees successfully!" << endl;
     for (int i = 0; i < new_bookstore.employee_number; i++) {
         out << "Employee " << i + 1 << ":" << endl;
         out << new_bookstore.employee[i] << endl;
     }
-    out << "\n\nYou've introduced " << new_bookstore.customer_number << " customers successfully!" << endl;
+    out << "\nYou've introduced " << new_bookstore.customer_number << " customers successfully!" << endl;
     for (int i = 0; i < new_bookstore.customer_number; i++) {
         out << "Customer " << i + 1 << ":" << endl;
         out << new_bookstore.customer[i] << endl;
     }
-    out << "\n\nIn stock you've introduced " << new_bookstore.books_number << " books: " << endl;
+    out << "\nIn stock you've introduced " << new_bookstore.books_number << " books: " << endl;
     for (int i = 0; i < new_bookstore.books_number; i++) {
         out << "Book " << i + 1 << ":" << endl;
         out << new_bookstore.books[i] << endl;
@@ -499,6 +526,7 @@ int main() {
     Book  book1("Padurea Spanzuratilor", "Prut", 233);
     Customer customer(101, "NUME PRENUME", "TIP CLIENT", 2);
     Employee employee(201, "N P", "rol", 5000);
+
     Bookstore bookstore("nume librarie", "adresa", 0, 0, 0);
     cout << bookstore;
 

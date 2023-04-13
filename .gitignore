@@ -1,5 +1,5 @@
 *.exe
-.idea/
+
 file * | sed -n '/text/d;/exec/s/^\(.*\):.*/\1/p'
 # Prerequisites
 *.d
@@ -43,3 +43,4 @@ file * | sed -n '/text/d;/exec/s/^\(.*\):.*/\1/p'
 # Unignore all dirs
 !*/
 ### Above combination will ignore all files without extension ###
+.idea/

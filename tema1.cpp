@@ -179,6 +179,10 @@ public:
     Customer(const Customer& customer);
 
     friend ostream& operator<<(std::ostream& out, const Customer& new_customer);
+
+    void setType(const MyString type_set);
+
+    int getNrOrders() const;
 };
 Customer::Customer() : customer_id(0), name(NULL), client_type(NULL), nr_of_orders(0) {}
 
@@ -211,6 +215,13 @@ ostream& operator<<(std::ostream& out, const Customer& new_customer) {
     out << "Nr of orders: " << new_customer.nr_of_orders << endl;
     return out;
 }
+int Customer::getNrOrders() const {
+    return nr_of_orders;
+}
+void Customer::setType(const MyString type_set) {
+    client_type = type_set;
+}
+
 
 
 /** Clasa Employee:
@@ -322,11 +333,11 @@ class Bookstore {
     int employee_number;
     Customer *customer;
     int customer_number;
-
+    bool ok;
 public:
     Bookstore();
 
-    Bookstore(const MyString& name1, const MyString& address1,int books_number1, int employee_number1, int customer_number1);
+    Bookstore(const MyString& name1, const MyString& address1,int books_number1, int employee_number1, int customer_number1, bool ok);
 
     ~Bookstore();
 
@@ -336,11 +347,23 @@ public:
 
     Bookstore(const Bookstore& another_bookstore);
 
+    /// Bookstore Setters:
+    void setName(const MyString new_name);
+
+    void setAddress(const MyString new_address);
+
+    void setBooks(const Book* new_books, int books_nr);
+
+    void setCustomers(const Customer* new_customers, int customer_nr);
+
+    void setEmployees(const Employee* new_employees, int employee_nr);
+
     /// Bussiness methods down here:
     double mediumSalary();
 
     double mediumPrice();
 
+    const MyString clientType();
 };
 Bookstore::Bookstore() : name(NULL), address(NULL), books(NULL), books_number(0), employee(NULL), employee_number(0), customer(NULL), customer_number(0) {}
 
@@ -356,84 +379,85 @@ Bookstore::~Bookstore() {
     }
 }
 
-Bookstore::Bookstore(const MyString& name1, const MyString& address1,int books_number1, int employee_number1, int customer_number1)
-:   name(name1), address(address1), employee(NULL), employee_number(employee_number1), customer(NULL), books_number(books_number1), books(NULL), customer_number(customer_number1)
+Bookstore::Bookstore(const MyString& name1, const MyString& address1,int books_number1, int employee_number1, int customer_number1, bool ok)
+:   name(name1), address(address1), employee(NULL), employee_number(employee_number1), customer(NULL), books_number(books_number1), books(NULL), customer_number(customer_number1), ok(0)
     {
-        name = name1;
-        address = address1;
-
-        cout << "Employees number: " << endl;
-        cin >> employee_number1;
-        employee_number = employee_number1;
-        cin.ignore();
-
-        if (employee_number > 0) {
-            employee = new Employee[employee_number];
-            for (int i = 0; i < employee_number; i++) {
-                char name[30];
-                char role[30];
-                int id;
-                int salary;
-
-                cout << "Employee's name: " << endl;
-                cin.getline(name, 30);
-                cout << "Employee's role:" << endl;
-                cin.getline(role, 30);
-                cout << "Employee ID: ";
-                cin >> id;
-                cout << "Salary: " << endl;
-                cin >> salary;
-
-                employee[i] = Employee(id, name, role, salary);
-                cin.ignore();
-            }
-        }
-
-        cout << "Customers number: " << endl;
-        cin >> customer_number1;
-        customer_number = customer_number1;
-        cin.ignore();
-        if (customer_number > 0) {
-            customer = new Customer[customer_number];
-            for (int i = 0; i < customer_number; i++) {
-                char name[30];
-                char client_type[30];
-                int id;
-                int orders_nr;
-
-                cout << "Client's name: " << endl;
-                cin.getline(name, 30);
-                cout << "Client's type:" << endl;
-                cin.getline(client_type, 30);
-                cout << "Customer ID: ";
-                cin >> id;
-                cout << "Number of orders: " << endl;
-                cin >> orders_nr;
-
-                customer[i] = Customer(id, name, client_type, orders_nr);
-                cin.ignore();
-            }
-    }
-
-    cout << "books number: " << endl;
-    cin >> books_number1;
-    books_number = books_number1;
-    cin.ignore();
-    if (books_number > 0) {
-        books = new Book[books_number];
-        for (int i = 0; i < books_number; i++) {
-            char title[30];
-            char author[30];
-            int price;
-            cout << "Book name: " << endl;
-            cin.getline(title, 30);
-            cout << "Author name:" << endl;
-            cin.getline(author, 30);
-            cout << "Price: ";
-            cin >> price;
-            books[i] = Book(title, author, price);
-
+        if (ok) {
             cin.ignore();
+            cout << "Bookstore name: " << endl;
+            cin >> name;
+            cout << "Bookstore address: " << endl;
+            cin >> address;
+            cout << "Employees number: " << endl;
+            cin >> employee_number1;
+            employee_number = employee_number1;
+            cin.ignore();
+
+            if (employee_number > 0) {
+                employee = new Employee[employee_number];
+                for (int i = 0; i < employee_number; i++) {
+                    char name[30];
+                    char role[30];
+                    int id;
+                    int salary;
+
+                    cout << "Employee's name: " << endl;
+                    cin.getline(name, 30);
+                    cout << "Employee's role:" << endl;
+                    cin.getline(role, 30);
+                    cout << "Employee ID: ";
+                    cin >> id;
+                    cout << "Salary: " << endl;
+                    cin >> salary;
+
+                    employee[i] = Employee(id, name, role, salary);
+                    cin.ignore();
+                }
+            }
+
+            cout << "Customers number: " << endl;
+            cin >> customer_number1;
+            customer_number = customer_number1;
+            cin.ignore();
+            if (customer_number > 0) {
+                customer = new Customer[customer_number];
+                for (int i = 0; i < customer_number; i++) {
+                    char name[30];
+                    int id;
+                    int orders_nr;
+
+                    cout << "Client's name: " << endl;
+                    cin.getline(name, 30);
+                    cout << "Customer ID: ";
+                    cin >> id;
+                    cout << "Number of orders: " << endl;
+                    cin >> orders_nr;
+
+                    customer[i] = Customer(id, name, clientType(), orders_nr);
+                    cin.ignore();
+                }
+            }
+
+            cout << "books number: " << endl;
+            cin >> books_number1;
+            books_number = books_number1;
+            cin.ignore();
+            if (books_number > 0) {
+                books = new Book[books_number];
+                for (int i = 0; i < books_number; i++) {
+                    char title[30];
+                    char author[30];
+                    int price;
+                    cout << "Book name: " << endl;
+                    cin.getline(title, 30);
+                    cout << "Author name:" << endl;
+                    cin.getline(author, 30);
+                    cout << "Price: ";
+                    cin >> price;
+                    books[i] = Book(title, author, price);
+
+                    cin.ignore();
+                }
             }
         }
 }
@@ -480,7 +504,7 @@ Bookstore& Bookstore::operator=(const Bookstore& bookstore) {
     return *this;
 }
 ostream& operator<<(std::ostream& out, const Bookstore& new_bookstore) {
-    out << "\n\n-------------------   BOOKSTORE  STAGE: < completed >    ----------------------" << endl;
+    out << "\n\n<<------------------->>   BOOKSTORE  STAGE: < completed >    <<---------------------->>" << endl;
     out << "\n\nBookstore name: " << new_bookstore.name << endl;
     out << "\nBookstore address: " << new_bookstore.address << endl;
 
@@ -527,6 +551,48 @@ Bookstore::Bookstore(const Bookstore& another_bookstore) {
         }
     }
 }
+void Bookstore::setName(const MyString new_name) {
+    name = new_name;
+}
+void Bookstore::setAddress(const MyString new_address) {
+    address = new_address;
+}
+void Bookstore::setBooks(const Book* new_books, int books_nr) {
+    if (books != NULL) {
+        delete [] books;
+    }
+    if (books_nr > 0) {
+        books_number = books_nr;
+        books = new Book[books_number];
+        for (int i = 0; i < books_number; i++) {
+            books[i] = new_books[i];
+        }
+    }
+}
+void Bookstore::setCustomers(const Customer *new_customers, int customer_nr) {
+    if (customer != NULL) {
+        delete [] customer;
+    }
+    if (customer_nr > 0) {
+        customer_number = customer_nr;
+        customer = new Customer[customer_nr];
+        for (int i = 0; i < customer_number; i++) {
+            customer[i] = new_customers[i];
+        }
+    }
+}
+void Bookstore::setEmployees(const Employee *new_employees, int employee_nr) {
+    if (employee != NULL) {
+        delete [] employee;
+    }
+    if (employee_nr > 0) {
+        employee_number = employee_nr;
+        employee = new Employee[employee_number];
+        for (int i = 0; i < employee_number; i++) {
+            employee[i] = new_employees[i];
+        }
+    }
+}
 double Bookstore::mediumSalary() {
     double med_sum = 0;
     for (int i = 0; i < employee_number; i++) {
@@ -542,15 +608,58 @@ double Bookstore::mediumPrice() {
     }
     return med_price / books_number;
 }
+const MyString Bookstore::clientType() {
+    for (int i = 0; i < customer_number; i++)
+        if (customer[i].getNrOrders() >= 2) {
+            return "Efficient";
+        } else {
+            return "Traditional";
+        }
+}
+
+
 int main() {
+    bool set_default = false;
     Book  book1("Padurea Spanzuratilor", "Prut", 233);
     Customer customer(101, "NUME PRENUME", "TIP CLIENT", 2);
     Employee employee(201, "N P", "rol", 5000);
 
-    Bookstore bookstore("nume librarie", "adresa", 0, 0, 0);
-    cout << bookstore;
-    cout << "\nPretul mediu books: " << bookstore.mediumPrice() << endl;
-    cout << "Salariu mediu employees: " << bookstore.mediumSalary() << endl;
+    cout << "Do you wanna use the default values or introduce by yourself ?      R: 1 - introduce by yourself    0 - default values" << endl;
+    cin >> set_default;
+    Bookstore bookstore1("nume librarie", "adresa", 0, 0, 0, set_default);
+
+    if (set_default) {
+        cout << "First bookstore : " << endl;
+        cout << bookstore1;
+        cout << "Pretul mediu books: " << bookstore1.mediumPrice() << endl;
+        cout << "Salariu mediu employees: " << bookstore1.mediumSalary() << endl;
+        return 0;
+    }
+        cout << "\n\nSecond Bookstore: " << endl;
+
+        bookstore1.setName("Librarius");
+        bookstore1.setAddress("Alba Iulia 184/2");
+
+        Customer new_customers[] = {Customer(100, "Baraboi Adrian", "Efficient", 2),
+                                    Customer(101, "Radu Laura", "Traditional", 1),
+                                    Customer(102, "Popa Valentin", "Efficient", 3)};
+        bookstore1.setCustomers(new_customers, 3);
+
+        Employee new_employees[] = {Employee(1000, "Racasan Nicoleta", "Vanzator Consultant", 10000),
+                                    Employee(1001, "Popescu Mihai Octavian", "Programator", 15000),
+                                    Employee(1002, "Salceanu Alexandru", "Administrator", 20000)};
+        bookstore1.setEmployees(new_employees, 3);
+
+        Book book[] = {Book("Strainul", "Albert Camus", 110),
+                       Book("Conditia umana", "Andre Malraux", 200),
+                       Book("Tropice triste", "Claude Levi-Strauss", 250),
+                       Book("Ulise", "James Joyse", 300),
+                       Book("Desertul Tatarilor", "Dino Buzzati", 220)};
+        bookstore1.setBooks(book, 5);
+
+        cout << bookstore1;
+        cout << "Pretul mediu books: " << bookstore1.mediumPrice() << endl;
+        cout << "Salariu mediu employees: " << bookstore1.mediumSalary() << endl;
 
     return 0;
 }

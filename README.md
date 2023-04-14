@@ -37,7 +37,7 @@ construita pe baza principiilor OOP.
     - Un destructor netrivial.
     - 5 setteri.
 
-#### Functionalitati:
+#### :chart_with_upwards_trend: Functionalitati:
 1. Capacitatea de a citi, retine si afisa o lista de carti, angajati si clienti prin alocare dinamica, pastrand caracteristicile acestora. 
 2. Returneaza salariul mediu al angajatilor printr-o valoare de tip double. Vezi `double mediumSalary()`.
 3. Returneaza pretul mediu pentru produsele din librarie `double mediumPrice()`.

@@ -3,7 +3,7 @@
  Scopul aplicatiei este de a intretine managementul unei librarii.
 Aceasta functioneaza in spatele unui meniu interactiv in consola C++,
 construita pe baza principiilor OOP.
-#### Asadar, au fost implementate 5 clase:
+#### :bookmark: Asadar, au fost implementate 5 clase:
 1. MyString
     - Functioneaza similar unei clase string. 
     - Are doua proprietati: data (alocare dinamica unui vector tip char) si size.

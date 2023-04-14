@@ -635,6 +635,7 @@ const MyString Bookstore::maxSalary() {
 
 int main() {
     bool set_default = false;
+    char repeat = 'Y';
     Book  book1("Padurea Spanzuratilor", "Liviu Rebreanu", 233);
     Customer customer(101, "Radu Valentin", "Traditional", 1);
     Employee employee(201, "Radu Laura", "casier", 5000);
@@ -647,6 +648,7 @@ int main() {
 //    cout << "Testing employee:" << endl;
 //    cout << employee << endl;
 
+while (repeat == 'Y') {
     cout << "Do you want to use the default values or introduce them by yourself ?        R: 1 - introduce by yourself    0 - default values" << endl;
     cin >> set_default;
     Bookstore bookstore1("nume librarie", "adresa", 0, 0, 0, set_default);
@@ -658,8 +660,11 @@ int main() {
         cout << "Salariu mediu employees: " << bookstore1.mediumSalary() << endl;
         cout << "Nr of efficient customers: " << bookstore1.efficientCustomers() << endl;
         cout << "Numele angajatului cu cel mai mare salariu: " <<bookstore1.maxSalary() << endl;
-        return 0;
-    }
+
+
+        cout << "Do you want to create one more bookstore ? R: Y - yes or N - no" << endl;
+        cin >> repeat;
+    } else {
         cout << "\n\nSecond Bookstore: " << endl;
 
         bookstore1.setName("Librarius");
@@ -686,6 +691,12 @@ int main() {
         cout << "Medium price books: " << bookstore1.mediumPrice() << endl;
         cout << "Medium salary employees: " << bookstore1.mediumSalary() << endl;
         cout << "Nr of efficient customers: " << bookstore1.efficientCustomers() << endl;
-        cout << "Numele angajatului cu cel mai mare salariu: " <<bookstore1.maxSalary() << endl;
+        cout << "Numele angajatului cu cel mai mare salariu: " << bookstore1.maxSalary() << endl;
+
+        cout << "Do you want to create one more bookstore ? R: Y - yes or N - no" << endl;
+        cin >> repeat;
+    }
+
+}
     return 0;
 }

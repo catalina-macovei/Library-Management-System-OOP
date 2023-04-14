@@ -83,7 +83,7 @@ MyString::~MyString() { //daca nu e null deja
 
 /**
  * Clasa Book
- * Aici voi pastra datele pentru fiecare carte sub forma (titlu, editura, autor, gen/categorie, pret)
+ * Aici voi pastra datele pentru fiecare carte sub forma (titlu, autor, pret)
  * */
 class Book {
     MyString title;
@@ -443,7 +443,6 @@ Bookstore::Bookstore(const MyString& name1, const MyString& address1,int books_n
                     cin.ignore();
                 }
             }
-
             cout << "books number: " << endl;
             cin >> books_number1;
             books_number = books_number1;

@@ -83,7 +83,7 @@ MyString::~MyString() { //daca nu e null deja
 
 /**
  * Clasa Book
- * Aici voi pastra datele pentru fiecare carte sub forma (titlu, editura, autor, gen/categorie, pret)
+ * Aici voi pastra datele pentru fiecare carte sub forma (titlu, autor, pret)
  * */
 class Book {
     MyString title;
@@ -363,7 +363,9 @@ public:
 
     double mediumPrice();
 
-    const MyString clientType();
+    int efficientCustomers();
+
+    const MyString maxSalary();
 };
 Bookstore::Bookstore() : name(NULL), address(NULL), books(NULL), books_number(0), employee(NULL), employee_number(0), customer(NULL), customer_number(0) {}
 
@@ -423,6 +425,7 @@ Bookstore::Bookstore(const MyString& name1, const MyString& address1,int books_n
                 customer = new Customer[customer_number];
                 for (int i = 0; i < customer_number; i++) {
                     char name[30];
+                    char type[30];
                     int id;
                     int orders_nr;
 
@@ -432,12 +435,14 @@ Bookstore::Bookstore(const MyString& name1, const MyString& address1,int books_n
                     cin >> id;
                     cout << "Number of orders: " << endl;
                     cin >> orders_nr;
-
-                    customer[i] = Customer(id, name, clientType(), orders_nr);
+                    if (orders_nr > 2)
+                        strcpy(type, "efficient");
+                    else
+                        strcpy(type, "traditional");
+                    customer[i] = Customer(id, name, type, orders_nr);
                     cin.ignore();
                 }
             }
-
             cout << "books number: " << endl;
             cin >> books_number1;
             books_number = books_number1;
@@ -461,7 +466,6 @@ Bookstore::Bookstore(const MyString& name1, const MyString& address1,int books_n
             }
         }
 }
-
 Bookstore& Bookstore::operator=(const Bookstore& bookstore) {
     if (this == &bookstore) {
         return *this;
@@ -600,7 +604,6 @@ double Bookstore::mediumSalary() {
     }
     return med_sum / employee_number;
 }
-
 double Bookstore::mediumPrice() {
     double med_price = 0;
     for (int i = 0; i < books_number; i++) {
@@ -608,23 +611,43 @@ double Bookstore::mediumPrice() {
     }
     return med_price / books_number;
 }
-const MyString Bookstore::clientType() {
-    for (int i = 0; i < customer_number; i++)
-        if (customer[i].getNrOrders() >= 2) {
-            return "Efficient";
-        } else {
-            return "Traditional";
+int Bookstore::efficientCustomers() {
+    int counter = 0;
+    for (int i = 0; i < customer_number; i++) {
+        if (customer[i].getNrOrders() > 2)
+            counter++;
+    }
+    return counter;
+}
+const MyString Bookstore::maxSalary() {
+    MyString ret_name;
+    int max = employee[0].getSalary();
+    ret_name = employee[0].getName();
+    for (int i = 0; i < employee_number; i++) {
+        if (max < employee[i].getSalary()) {
+            max = employee[i].getSalary();
+            ret_name = employee[i].getName();
         }
+    }
+    return ret_name;
 }
 
 
 int main() {
     bool set_default = false;
-    Book  book1("Padurea Spanzuratilor", "Prut", 233);
-    Customer customer(101, "NUME PRENUME", "TIP CLIENT", 2);
-    Employee employee(201, "N P", "rol", 5000);
+    Book  book1("Padurea Spanzuratilor", "Liviu Rebreanu", 233);
+    Customer customer(101, "Radu Valentin", "Traditional", 1);
+    Employee employee(201, "Radu Laura", "casier", 5000);
 
-    cout << "Do you wanna use the default values or introduce by yourself ?      R: 1 - introduce by yourself    0 - default values" << endl;
+    /// For testing, you may skip this section
+//    cout << "Testing Book:" << endl;
+//    cout << book1 << endl;
+//    cout << "Testing customer:" << endl;
+//    cout << customer << endl;
+//    cout << "Testing employee:" << endl;
+//    cout << employee << endl;
+
+    cout << "Do you want to use the default values or introduce them by yourself ?        R: 1 - introduce by yourself    0 - default values" << endl;
     cin >> set_default;
     Bookstore bookstore1("nume librarie", "adresa", 0, 0, 0, set_default);
 
@@ -633,6 +656,8 @@ int main() {
         cout << bookstore1;
         cout << "Pretul mediu books: " << bookstore1.mediumPrice() << endl;
         cout << "Salariu mediu employees: " << bookstore1.mediumSalary() << endl;
+        cout << "Nr of efficient customers: " << bookstore1.efficientCustomers() << endl;
+        cout << "Numele angajatului cu cel mai mare salariu: " <<bookstore1.maxSalary() << endl;
         return 0;
     }
         cout << "\n\nSecond Bookstore: " << endl;
@@ -641,7 +666,7 @@ int main() {
         bookstore1.setAddress("Alba Iulia 184/2");
 
         Customer new_customers[] = {Customer(100, "Baraboi Adrian", "Efficient", 2),
-                                    Customer(101, "Radu Laura", "Traditional", 1),
+                                    Customer(101, "Radu Laura", "Traditional", 4),
                                     Customer(102, "Popa Valentin", "Efficient", 3)};
         bookstore1.setCustomers(new_customers, 3);
 
@@ -658,8 +683,9 @@ int main() {
         bookstore1.setBooks(book, 5);
 
         cout << bookstore1;
-        cout << "Pretul mediu books: " << bookstore1.mediumPrice() << endl;
-        cout << "Salariu mediu employees: " << bookstore1.mediumSalary() << endl;
-
+        cout << "Medium price books: " << bookstore1.mediumPrice() << endl;
+        cout << "Medium salary employees: " << bookstore1.mediumSalary() << endl;
+        cout << "Nr of efficient customers: " << bookstore1.efficientCustomers() << endl;
+        cout << "Numele angajatului cu cel mai mare salariu: " <<bookstore1.maxSalary() << endl;
     return 0;
 }

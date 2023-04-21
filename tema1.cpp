@@ -329,7 +329,7 @@ class Bookstore {
     MyString address;
     Book *books;
     int books_number;
-    Employee *employee;      // a list of employees and their roles needed
+    Employee *employee;
     int employee_number;
     Customer *customer;
     int customer_number;
@@ -648,7 +648,7 @@ int main() {
 //    cout << "Testing employee:" << endl;
 //    cout << employee << endl;
 
-while (repeat == 'Y') {
+while (repeat == 'Y' || repeat == 'y') {
     cout << "Do you want to use the default values or introduce them by yourself ?        R: 1 - introduce by yourself    0 - default values" << endl;
     cin >> set_default;
     Bookstore bookstore1("nume librarie", "adresa", 0, 0, 0, set_default);

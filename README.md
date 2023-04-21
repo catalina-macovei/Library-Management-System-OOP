@@ -38,13 +38,14 @@ construita pe baza principiilor OOP.
     - 5 setteri.
 
 #### :chart_with_upwards_trend: Functionalitati:
-1. Capacitatea de a citi, retine si afisa o lista de carti, angajati si clienti prin alocare dinamica, pastrand caracteristicile acestora. 
-2. Returneaza salariul mediu al angajatilor printr-o valoare de tip double. Vezi `double mediumSalary()`.
-3. Returneaza pretul mediu pentru produsele din librarie `double mediumPrice()`.
-4. Returneaza numarul de clienti care au mai mult de 2 comenzi `int efficientCustomers()`.
-5. Returneaza numele angajatului cu cel mai mare salariu `const MyString maxSalary()`.
-6. Folosind setteri, exista optiunea de a seta valori default pentru a testa programul si metodele, dar aceleasi valori pot fi introduse de la tastatura.
-7. La fel a fost supraincarcat `operator<<` pentru afisarea fiecarei clase.
-8. In main exista un meniu interactiv unde poti alege metoda de completare a datelor si testa functionalitatile.
+1. Are propria clasa string - `MyString`, care poate citi si afisa un sir de caractere. La fel, e posibila asignarea, copierea sirului. Clasa functioneaza prin alocare dinamica.
+2. Capacitatea de a citi, retine si afisa o lista de carti, angajati si clienti prin alocare dinamica, pastrand caracteristicile acestora. 
+3. Returneaza salariul mediu al angajatilor printr-o valoare de tip double. Vezi `double mediumSalary()`.
+4. Returneaza pretul mediu pentru produsele din librarie `double mediumPrice()`.
+5. Returneaza numarul de clienti care au mai mult de 2 comenzi `int efficientCustomers()`.
+6. Returneaza numele angajatului cu cel mai mare salariu `const MyString maxSalary()`.
+7. Folosind setteri, exista optiunea de a seta valori default pentru a testa programul si metodele, dar aceleasi valori pot fi introduse de la tastatura.
+8. La fel a fost supraincarcat `operator<<` pentru afisarea fiecarei clase.
+9. In main exista un meniu interactiv unde poti alege metoda de completare a datelor si testa functionalitatile.
 
 

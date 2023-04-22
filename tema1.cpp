@@ -649,6 +649,8 @@ int main() {
 //    cout << employee << endl;
 
 while (repeat == 'Y' || repeat == 'y') {
+    char meth;
+
     cout << "Do you want to use the default values or introduce them by yourself ?        R: 1 - introduce by yourself    0 - default values" << endl;
     cin >> set_default;
     Bookstore bookstore1("nume librarie", "adresa", 0, 0, 0, set_default);
@@ -656,12 +658,16 @@ while (repeat == 'Y' || repeat == 'y') {
     if (set_default) {
         cout << "First bookstore : " << endl;
         cout << bookstore1;
-        cout << "Pretul mediu books: " << bookstore1.mediumPrice() << endl;
-        cout << "Salariu mediu employees: " << bookstore1.mediumSalary() << endl;
-        cout << "Nr of efficient customers: " << bookstore1.efficientCustomers() << endl;
-        cout << "Numele angajatului cu cel mai mare salariu: " <<bookstore1.maxSalary() << endl;
 
-
+        cout << "Do you want to see a data revision?  R: Y - yes or N - no" << endl;
+        cin >> meth;
+       if (meth == 'Y' || meth == 'y') {
+           cout << "<<---------------Revision--------------->>" << endl;
+           cout << "Pretul mediu books: " << bookstore1.mediumPrice() << endl;
+           cout << "Salariu mediu employees: " << bookstore1.mediumSalary() << endl;
+           cout << "Nr of efficient customers: " << bookstore1.efficientCustomers() << endl;
+           cout << "Numele angajatului cu cel mai mare salariu: " <<bookstore1.maxSalary() << endl;
+       }
         cout << "Do you want to create one more bookstore ? R: Y - yes or N - no" << endl;
         cin >> repeat;
     } else {
@@ -688,11 +694,16 @@ while (repeat == 'Y' || repeat == 'y') {
         bookstore1.setBooks(book, 5);
 
         cout << bookstore1;
-        cout << "Medium price books: " << bookstore1.mediumPrice() << endl;
-        cout << "Medium salary employees: " << bookstore1.mediumSalary() << endl;
-        cout << "Nr of efficient customers: " << bookstore1.efficientCustomers() << endl;
-        cout << "Numele angajatului cu cel mai mare salariu: " << bookstore1.maxSalary() << endl;
 
+        cout << "Do you want to see a data revision?  R: Y - yes or N - no" << endl;
+        cin >> meth;
+        if (meth == 'Y' || meth == 'y') {
+            cout << "<<---------------Revision--------------->>" << endl;
+            cout << "Pretul mediu books: " << bookstore1.mediumPrice() << endl;
+            cout << "Salariu mediu employees: " << bookstore1.mediumSalary() << endl;
+            cout << "Nr of efficient customers: " << bookstore1.efficientCustomers() << endl;
+            cout << "Numele angajatului cu cel mai mare salariu: " <<bookstore1.maxSalary() << endl;
+        }
         cout << "Do you want to create one more bookstore ? R: Y - yes or N - no" << endl;
         cin >> repeat;
     }

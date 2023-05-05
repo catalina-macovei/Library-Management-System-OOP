@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstring>
+#include <string>
 using namespace std;
 
 /**MyString:
@@ -82,6 +83,7 @@ MyString::~MyString() { //daca nu e null deja
 
 /**class Product:
  * this class will be inherited by two classes
+ * it's an interface
  * */
 class Product {
 public:
@@ -923,6 +925,93 @@ void Manager::increaseSalary(double percent_increase) {
 //}
 //
 
+/**Class Event
+ * Abstract
+ * One pure virtual function
+ * */
+class Event {
+private:
+    string name;
+    virtual double calculateTotalExpenses() = 0;
+public:
+    Event();
+    Event(string name1);
+    string getName();
+    virtual ~Event();
+};
+Event::Event() : name("hi") {}
+string Event::getName() {
+    return name;
+}
+Event::~Event() {}
+Event::Event(string name1) : name(name1) {}
+
+class Donatie : public virtual Event {
+    int donation_expenses;
+    int sponsorship;
+public:
+    Donatie();
+    Donatie(int donation_expenses1, int sponsorship1);
+    int getDonationExp() const;
+    int getDsponsorhip() const;
+};
+
+Donatie::Donatie() : donation_expenses(0), sponsorship(0) {}
+
+Donatie::Donatie(int donation_expenses1, int sponsorship1)
+        : donation_expenses(donation_expenses1), sponsorship(sponsorship1) {}
+
+int Donatie::getDonationExp() const {
+    return donation_expenses;
+}
+
+int Donatie::getDsponsorhip() const {
+    return sponsorship;
+}
+
+
+class Concurs : public virtual Event {
+    int premium;    // the value of the premium in lei
+    int c_sponsorhip;       // what's the budget for organising the contest
+public:
+    Concurs();
+    Concurs(int premium1, int c_sponsorship1);
+    int getPremium() const;
+    int getCsponsorship() const;
+};
+
+Concurs::Concurs() : premium(0), c_sponsorhip(0) {}
+
+Concurs::Concurs(int premium1, int c_sponsorship1) : premium(premium1), c_sponsorhip(c_sponsorship1){}
+
+int Concurs::getPremium() const {
+    return premium;
+}
+int Concurs::getCsponsorship() const {
+    return c_sponsorhip;
+}
+
+
+class Campanie : public Donatie, public Concurs{
+    int x;
+public:
+    Campanie();
+    Campanie(int x1, int premium1, int c_sponsorship1, int donation_expenses1, int sponsorship1);
+    void showEventName();
+    virtual double calculateTotalExpenses();
+};
+Campanie::Campanie() : x(0) {}
+
+Campanie::Campanie(int x1, int premium1, int c_sponsorship1, int donation_expenses1, int sponsorship1)
+        : x(x1), Concurs(premium1, c_sponsorship1), Donatie(donation_expenses1, sponsorship1) {}
+
+void Campanie::showEventName() {
+    cout << getName() << endl;
+}
+double Campanie::calculateTotalExpenses() {
+    return getPremium() + getCsponsorship() + x + getDsponsorhip() + getDonationExp();
+}
+
 int main() {
     bool set_default = false;
     char repeat = 'Y';
@@ -1024,6 +1113,8 @@ int main() {
     }
     OfficeSupplies supplies("caiet", 30, 20, 3);
     cout << supplies;
-
+    Campanie campanie(1, 200, 300, 100, 200);
+    Campanie().showEventName();
+    cout << campanie.calculateTotalExpenses() << endl;
     return 0;
 }

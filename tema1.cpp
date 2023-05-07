@@ -82,6 +82,7 @@ MyString::~MyString() { //daca nu e null deja
 }
 
 /**class Product:
+ * it's abstract
  * this class will be inherited by two classes
  * it's an interface
  * */
@@ -259,7 +260,7 @@ ostream& operator<<(ostream& out, const OfficeSupplies& supp) {
 
 /**Class User:
  * defined to set a password and a user name for users of bookstore app:
- * customer, employee, Admin.
+ * customer, employee, manager.
  * */
 class User {
 protected:
@@ -300,31 +301,6 @@ User& User::operator=(const User &user) {
 User::User(const User& user) {
     this->password = user.password;
     this->username = user.username;
-}
-
-
-/**Administrator (Admin) Class:
- * organizing meetings
- * doing inventory management
- * The manager can be an admin
- * */
-class Admin: protected User {
-    MyString task; // e.g. add 5 books
-public:
-    Admin();
-    Admin(const MyString &task1, const MyString &password1, const MyString &username1);
-    void setTask(const MyString task_set);
-    const MyString getTask() const;
-};
-Admin::Admin() : task(NULL), User() {}
-Admin::Admin(const MyString &task1, const MyString &password1, const MyString &username1)
-        : task(task1), User(password1, username1)
-        {}
-void Admin::setTask(const MyString task_set) {
-    task = task_set;
-}
-const MyString Admin::getTask() const{
-    return task;
 }
 
 /**Clasa Customer:
@@ -538,12 +514,12 @@ void Employee::increaseSalary(double percent_increase) {
  * managing schedules
  * inventory management
  * */
-class Manager : public Employee, public Admin {
+class Manager : public Employee {
 private:
     MyString responsibility;
 public:
     Manager();
-    Manager(int employee_id1, const MyString &name1, const MyString &role1, int salary1,const MyString &task1, const MyString &password1, const MyString &username1, const MyString &responsibility1);
+    Manager(int employee_id1, const MyString &name1, const MyString &role1, int salary1, const MyString &password1, const MyString &username1, const MyString &responsibility1);
     Manager& operator=(const Manager& manager);
     Manager(const Manager &manager);
     friend ostream& operator<<(std::ostream& out, const Manager& new_manager);
@@ -561,10 +537,10 @@ public:
 
 };
 
-Manager::Manager() : Employee(), Admin() {}
+Manager::Manager() : Employee() {}
 
-Manager::Manager(int employee_id1, const MyString &name1, const MyString &role1, int salary1,const MyString &task1, const MyString &password1, const MyString &username1, const MyString &responsibility1)
-        : responsibility(responsibility1), Admin(task1, password1, username1), Employee(employee_id1, name1, role1, salary1, password1, username1 ) {}
+Manager::Manager(int employee_id1, const MyString &name1, const MyString &role1, int salary1, const MyString &password1, const MyString &username1, const MyString &responsibility1)
+        : responsibility(responsibility1), Employee(employee_id1, name1, role1, salary1, password1, username1 ) {}
 
 Manager& Manager::operator=(const Manager& manager) {
     if (this == &manager) {
@@ -587,7 +563,6 @@ ostream& operator<<(std::ostream& out, const Manager& new_manager) {
     out << "\n\nAbout Manager details: " << endl;
     out << static_cast<const Employee&>(new_manager);           // print base class fields
     out << "Manager responsibility: " << new_manager.responsibility << endl;
-    out << "Administrator task: " << new_manager.getTask() << endl;
     return out;
 }
 
@@ -932,16 +907,22 @@ void Manager::increaseSalary(double percent_increase) {
 class Event {
 private:
     string name;
-    virtual double calculateTotalExpenses() = 0;
+
 public:
+    virtual void showEventName() { cout << "Base:: showEventName() " << getName() << endl;};
+    virtual double calculateTotalExpenses() { cout << "Event total expenses:  0 "; return 0; };
+    void setEventName(string name_set);
     Event();
     Event(string name1);
-    string getName();
-    virtual ~Event();
+    string getName() const;
+    virtual ~Event() = 0;
 };
 Event::Event() : name("hi") {}
-string Event::getName() {
+string Event::getName() const {
     return name;
+}
+void Event::setEventName(string name_set) {
+    name = name_set;
 }
 Event::~Event() {}
 Event::Event(string name1) : name(name1) {}
@@ -954,6 +935,8 @@ public:
     Donatie(int donation_expenses1, int sponsorship1);
     int getDonationExp() const;
     int getDsponsorhip() const;
+    virtual void showEventName() { cout << "Derived donation:: showEventName() " << getName() << endl; };
+    virtual double calculateTotalExpenses() { cout << "Donation total expenses:   "; return getDsponsorhip() + getDonationExp(); };
 };
 
 Donatie::Donatie() : donation_expenses(0), sponsorship(0) {}
@@ -978,6 +961,8 @@ public:
     Concurs(int premium1, int c_sponsorship1);
     int getPremium() const;
     int getCsponsorship() const;
+    virtual void showEventName() { cout << "Contest name is " << getName() << endl; };
+    virtual double calculateTotalExpenses() { cout << "Contest total expenses:   "; return getCsponsorship() + getPremium(); };
 };
 
 Concurs::Concurs() : premium(0), c_sponsorhip(0) {}
@@ -997,7 +982,7 @@ class Campanie : public Donatie, public Concurs{
 public:
     Campanie();
     Campanie(int x1, int premium1, int c_sponsorship1, int donation_expenses1, int sponsorship1);
-    void showEventName();
+    virtual void showEventName() { cout << "Campain name is " << getName() << endl; };
     virtual double calculateTotalExpenses();
 };
 Campanie::Campanie() : x(0) {}
@@ -1005,10 +990,8 @@ Campanie::Campanie() : x(0) {}
 Campanie::Campanie(int x1, int premium1, int c_sponsorship1, int donation_expenses1, int sponsorship1)
         : x(x1), Concurs(premium1, c_sponsorship1), Donatie(donation_expenses1, sponsorship1) {}
 
-void Campanie::showEventName() {
-    cout << getName() << endl;
-}
 double Campanie::calculateTotalExpenses() {
+    cout << "Campain total expenses: ";
     return getPremium() + getCsponsorship() + x + getDsponsorhip() + getDonationExp();
 }
 
@@ -1021,11 +1004,11 @@ int main() {
 
     /// For testing, you may skip this section
 //    cout << "Testing Book:" << endl;
-    cout << book1 << endl;
+//    cout << book1 << endl;
 //    cout << "Testing customer:" << endl;
-    cout << customer << endl;
+//    cout << customer << endl;
 //    cout << "Testing employee:" << endl;
-   cout << employee << endl;
+//    cout << employee << endl;
 
 //while (repeat == 'Y' || repeat == 'y') {
 //    char meth;
@@ -1092,29 +1075,57 @@ int main() {
 /// Part 2 of testing :
 
 
-    Manager manager(101, "Paolo Escobar", "staff manager", 10000,"count books", "uuu", "ppp", "hiring");
+//    Manager manager(101, "Paolo Escobar", "staff manager", 10000, "uuu", "ppp", "hiring");
+//
+//    char increase;
+//    cout << manager;
+//    cout << "\nYou want to increase salary for manager? Y/N" << endl;
+//    cin >> increase;
+//
+//    if (increase == 'Y' || increase == 'y') {
+//
+//        manager.increaseSalary(10.5);
+//
+//        cout << "\nThe new salary for this manager is:  "
+//        << manager.getSalary() << " lei"<< endl;
+//
+//    } else {
+//
+//        cout << "\nOk. The salary remains the same :((" << endl;
+//
+//    }
+//    OfficeSupplies supplies("caiet", 30, 20, 3);
+//    cout << supplies;
+//    Campanie campanie(1, 200, 300, 100, 200);
+//    Campanie().showEventName();
+//    cout << campanie.calculateTotalExpenses() << endl;
 
-    char increase;
-    cout << manager;
-    cout << "\nYou want to increase salary for manager? Y/N" << endl;
-    cin >> increase;
+    /**DYNAMIC DISPATCH on class Event:
+     * Make sure you have defined a virtual function in your base class
+     * Override keyword after function definition in derived class
+     * Voila! Dynamic dispatch - the mechanism to choose at runtime the correct function is done
+     * To actually call that matches the data type of your object
+     * */
+     Event* event  = new Donatie(5000, 40000);
+     cout << event->calculateTotalExpenses() << endl;
+     delete event;
 
-    if (increase == 'Y' || increase == 'y') {
+     cout << endl;
 
-        manager.increaseSalary(10.5);
+     Event* event1 = new Campanie(1, 200, 300, 100, 200);
+     event1->setEventName("Licurici");
+     event1->showEventName();
+     cout << event1->calculateTotalExpenses() << endl;
+     delete event1;
 
-        cout << "\nThe new salary for this manager is:  "
-        << manager.getSalary() << " lei"<< endl;
+    cout << endl;
 
-    } else {
 
-        cout << "\nOk. The salary remains the same :((" << endl;
+     Event* event2 = new Concurs(200, 3000);
+     event2->setEventName("Concurs");
+     event2->showEventName();
+     cout << event2->calculateTotalExpenses() << endl;
+     delete event2;
 
-    }
-    OfficeSupplies supplies("caiet", 30, 20, 3);
-    cout << supplies;
-    Campanie campanie(1, 200, 300, 100, 200);
-    Campanie().showEventName();
-    cout << campanie.calculateTotalExpenses() << endl;
     return 0;
 }

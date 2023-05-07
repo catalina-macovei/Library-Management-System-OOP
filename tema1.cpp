@@ -155,6 +155,7 @@ double Book::discountedPrice() const {
 }
 
 double Book::calculateShippingCost() const {
+    cout << "\nShipping Cost is: ";
     return discountedPrice() + calculateTax();
 }
 
@@ -994,6 +995,12 @@ double Campanie::calculateTotalExpenses() {
     cout << "Campain total expenses: ";
     return getPremium() + getCsponsorship() + x + getDsponsorhip() + getDonationExp();
 }
+void progression(Employee& emp) {
+    emp.setRole("director");
+    emp.setSalary(15000);
+    cout << "Manager promoted to next level!";
+}
+
 
 int main() {
     bool set_default = false;
@@ -1118,7 +1125,7 @@ int main() {
      cout << event1->calculateTotalExpenses() << endl;
      delete event1;
 
-    cout << endl;
+     cout << endl;
 
 
      Event* event2 = new Concurs(200, 3000);
@@ -1126,6 +1133,29 @@ int main() {
      event2->showEventName();
      cout << event2->calculateTotalExpenses() << endl;
      delete event2;
+
+     /**Upcasting :
+      * */
+
+     Manager manager(101, "Paolo Escobar", "staff manager", 10000, "uuu", "ppp", "hiring");
+     cout << manager;
+     progression(manager);      // helps reuse the code from employee
+     cout << manager;
+
+    Book  book3("Padurea Spanzuratilor", "Liviu Rebreanu", 233, 20, 5);
+    Product* prod1 = &book3;
+    cout <<"\nUpcasting done: " << endl;
+    cout << prod1->calculateShippingCost() << " lei" << endl;
+    cout << "Discounted price " << prod1->discountedPrice() << " lei" << endl;
+    cout << "Tax value:  " << prod1->calculateTax() << " lei" << endl;
+
+
+    OfficeSupplies office_sup("Carnet", 80, 25, 5);
+    Product* prod2 = &office_sup;
+    cout <<"\nUpcasting done: " << endl;
+    cout << prod2->calculateShippingCost() << " lei" << endl;
+    cout << "Discounted price " << prod2->discountedPrice() << " lei" << endl;
+    cout << "Tax value:  " << prod2->calculateTax() << " lei" << endl;
 
     return 0;
 }

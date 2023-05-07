@@ -81,6 +81,15 @@ MyString::~MyString() { //daca nu e null deja
     }
 }
 
+/** Exeption:
+ * */
+class IllegallPriceExpt : public std::exception {
+public:
+    const char* what() const throw () {
+        return "Illegal price exception";
+    }
+};
+
 /**class Product:
  * it's abstract
  * this class will be inherited by two classes
@@ -146,7 +155,11 @@ Book::Book() : title(NULL), author(NULL), Product()  {}
 
 Book::Book(const MyString title1, const MyString author1, int gross_price1, int discount1, int tax1)
     : gross_price(gross_price1), title(title1), author(author1), discount(discount1), tax(tax1), Product()
-    {}
+    {
+        if (gross_price1 < 0) {
+            throw IllegallPriceExpt ();
+        }
+    }
 
 Book::~Book() {}
 
@@ -1155,21 +1168,23 @@ int main() {
 
 
     /**Downcasting:
-     * */
-    // down cast -> decomenteaza
-    //    Student* student = dynamic_cast<Student*>(user);
-    //    if (student != nullptr) {
-    //        student->showAvg();
-    //    }
-    /* *    User* user = new Student("Ana", 17, 2897, 9.88);
-            user->showAge();
-            user->showAge(5);
+     * using dynamic_cast
      * */
     Event* event11 = new Donatie(222, 222);
 
     Donatie* donatie = dynamic_cast<Donatie*>(event11);
     if (donatie != nullptr) {
-        cout << donatie->calculateEdonation();
+        cout << "\n  " << donatie->calculateEdonation() << endl;
+    }
+
+
+    /**Exception handling:
+     * */
+    try {
+        Book bookEx("aaa", "aaaa", -333, 33, 33);
+    }
+    catch (const IllegallPriceExpt &ex) {
+        cout << ex.what() << "\n";
     }
 
     return 0;

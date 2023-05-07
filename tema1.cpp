@@ -937,7 +937,7 @@ public:
     int getDonationExp() const;
     int getDsponsorhip() const;
     virtual void showEventName() { cout << "Derived donation:: showEventName() " << getName() << endl; };
-    virtual double calculateTotalExpenses() { cout << "Donation total expenses:   "; return getDsponsorhip() + getDonationExp(); };
+    double calculateEdonation() { cout << "\nDynamic cast\n" << "Total expenses for donation: " << endl; return getDsponsorhip() + getDonationExp();}
 };
 
 Donatie::Donatie() : donation_expenses(0), sponsorship(0) {}
@@ -1113,10 +1113,6 @@ int main() {
      * Voila! Dynamic dispatch - the mechanism to choose at runtime the correct function is done
      * To actually call that matches the data type of your object
      * */
-     Event* event  = new Donatie(5000, 40000);
-     cout << event->calculateTotalExpenses() << endl;
-     delete event;
-
      cout << endl;
 
      Event* event1 = new Campanie(1, 200, 300, 100, 200);
@@ -1156,6 +1152,25 @@ int main() {
     cout << prod2->calculateShippingCost() << " lei" << endl;
     cout << "Discounted price " << prod2->discountedPrice() << " lei" << endl;
     cout << "Tax value:  " << prod2->calculateTax() << " lei" << endl;
+
+
+    /**Downcasting:
+     * */
+    // down cast -> decomenteaza
+    //    Student* student = dynamic_cast<Student*>(user);
+    //    if (student != nullptr) {
+    //        student->showAvg();
+    //    }
+    /* *    User* user = new Student("Ana", 17, 2897, 9.88);
+            user->showAge();
+            user->showAge(5);
+     * */
+    Event* event11 = new Donatie(222, 222);
+
+    Donatie* donatie = dynamic_cast<Donatie*>(event11);
+    if (donatie != nullptr) {
+        cout << donatie->calculateEdonation();
+    }
 
     return 0;
 }

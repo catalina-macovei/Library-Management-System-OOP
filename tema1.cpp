@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstring>
 #include <string>
+#include <cmath>
 using namespace std;
 
 /**MyString:
@@ -86,7 +87,21 @@ MyString::~MyString() { //daca nu e null deja
 class IllegallPriceExpt : public std::exception {
 public:
     const char* what() const throw () {
-        return "Illegal price exception";
+        return "\nIllegal price exception\n";
+    }
+};
+
+class IllegalTaxExpt : public exception {
+public:
+    const char* what() const throw () {
+        return "\nIllegal tax exception! Tax ican't be higher than 100. It is in %!\n";
+    }
+};
+
+class IllegalIdExpt : public exception {
+public:
+    const char* what() const throw () {
+        return "\nThat's not a legall ID! It should be three digits long!\n";
     }
 };
 
@@ -244,6 +259,10 @@ public:
     virtual double calculateTax() const;
 
     virtual double discountedPrice() const;
+
+    void setTax(int tax1) ;
+
+    int getTax() const;
 };
 
 OfficeSupplies::OfficeSupplies()
@@ -252,6 +271,14 @@ OfficeSupplies::OfficeSupplies()
 OfficeSupplies::OfficeSupplies(const MyString &name1, int gross_price1, int discount1, int tax1)
                 :   Product(), name(name1), gross_price(gross_price1), discount(discount1), tax(tax1)
                 {}
+
+void OfficeSupplies::setTax(int tax1) {
+    tax = tax1;
+}
+
+int OfficeSupplies::getTax() const {
+    return tax;
+}
 
 double OfficeSupplies::discountedPrice() const {
     return gross_price - gross_price * discount / 100;
@@ -262,6 +289,7 @@ double OfficeSupplies::calculateShippingCost() const {
 }
 
 double OfficeSupplies::calculateTax() const {
+    if (tax > 100) { throw IllegalTaxExpt(); }
     return discountedPrice() * tax / 100;
 }
 ostream& operator<<(ostream& out, const OfficeSupplies& supp) {
@@ -452,11 +480,13 @@ public:
     void setId(int id_set);
 };
 
-Employee::Employee() : employee_id(0), name(NULL), role(NULL), salary(0)  {}
+Employee::Employee() : name(NULL), role(NULL), salary(0)  {}
 
 Employee::Employee(int employee_id1, const MyString &name1, const MyString &role1, int salary1, const MyString &password1, const MyString &username1)
             : employee_id(employee_id1), name(name1), role(role1), salary(salary1), User(password1, username1)
-            {}
+            {
+                if (int(log10(employee_id) + 1) != 3) { throw IllegalIdExpt (); }
+            }
 
 Employee& Employee::operator=(const Employee& employee) {
     if (this == &employee) {
@@ -1186,6 +1216,42 @@ int main() {
     catch (const IllegallPriceExpt &ex) {
         cout << ex.what() << "\n";
     }
+    OfficeSupplies offsup("pix", 23, 40, 1645);
+    int temporary;
+
+    try {
+        offsup.calculateTax();
+    }
+    catch (const IllegalTaxExpt &ex) {
+        cout << ex.what() << endl;
+
+        temporary = offsup.getTax() / 10;
+        offsup.setTax(temporary);
+
+        temporary = offsup.getTax();
+        cout << "The new truncated tax is " << temporary << endl;
+
+        try {
+            if (temporary > 100) { throw temporary; }
+        }
+        catch(int temp) {
+            cout << "Truncation failed! " << endl;
+            bool tax_tracker = false;
+
+            while(!tax_tracker) {
+                cout << "Set new value for tax: " << endl;
+                cin >> temporary;
+                if (temporary < 100) {
+                    offsup.setTax(temporary);
+                    cout << "New tax has been set: " << offsup.getTax() << endl;
+                    tax_tracker = true;
+                }
+            }
+        }
+    }
+
+    /**Static testing:
+     * */
 
     return 0;
 }

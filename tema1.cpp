@@ -290,7 +290,6 @@ public:
     User();
     User(string password1, string username1);
     User& operator=(const User &user);
-
     static void greeting_user() { cout << "Wellcome to Bookstore! " << "\nPlease introduce user details: " << endl;};
     friend istream& operator>>(istream& in, User& user);
 };
@@ -618,52 +617,54 @@ double Campanie::calculateTotalExpenses() {
 }
 
 int main() {
-    bool set_default = false;
-    char repeat = 'Y';
-    string username = "";
-    string password = "";
-    bool account_option;
-
-    Employee employee("", "", 5000);
-    Book  book1("Padurea Spanzuratilor", "Liviu Rebreanu", 233, 20, 5);
-    Customer customer("Radu Valentin",  1);
-    cout << "\nChoose an account type:    0-Customer  |   1-Employee\n";
-    cin >> account_option;
-    if (account_option == 0) {
-        cin >> customer;
-        cout << "Please loggin to see your account details! " << endl;
-        cout << "Introduce username: " << endl;
-        cin >> username;
-        cout << "Introduce password: " << endl;
-        cin >> password;
-        if (customer.validation_input(username, password)) {
-            cout << "Authentification successfull!" << endl;
-            cout << "---Account details---" << endl;
-            cout << customer;
-            cout << "nr of orders: " << customer.getNrOrders() << endl;
-            cout << "----------------\n" << endl;
-        }
-    } else if (account_option == 1) {
-        cin >> employee;
-        cout << "Please loggin to see your account details! " << endl;
-        cout << "Introduce username: " << endl;
-        cin >> username;
-        cout << "Introduce password: " << endl;
-        cin >> password;
-        if (employee.validation_input(username, password)) {
-            cout << "Authentification successfull!" << endl;
-            cout << "---Account details---" << endl;
-            cout << employee;
-            cout << "----------------\n" << endl;
-            /////////////////////////////////////////////////////////////
-            cout << "Employee Menu: " << endl;
-            cout << "\n1.Add an Event" << endl;
-            cout << "2.Display a list of Events" << endl;
-            cout << "3.Delete an Event" << endl;
-            cout << "4.EXIT 0";
-        }
-    }
-
+//    bool set_default = false;
+//    char repeat = 'Y';
+//    string username = "";
+//    string password = "";
+//    bool account_option;
+//
+//    Employee employee("", "", 5000);
+//    Book  book1("Padurea Spanzuratilor", "Liviu Rebreanu", 233, 20, 5);
+//    Customer customer("Radu Valentin",  1);
+//    cout << "\nChoose an account type:    0-Customer  |   1-Employee\n";
+//    cin >> account_option;
+//    if (account_option == 0) {
+//        cin >> customer;
+//        cout << "Please loggin to see your account details! " << endl;
+//        cout << "Introduce username: " << endl;
+//        cin >> username;
+//        cout << "Introduce password: " << endl;
+//        cin >> password;
+//        if (customer.validation_input(username, password)) {
+//            cout << "Authentification successfull!" << endl;
+//            cout << "---Account details---" << endl;
+//            cout << customer;
+//            cout << "nr of orders: " << customer.getNrOrders() << endl;
+//            cout << "----------------\n" << endl;
+//        }
+//    } else if (account_option == 1) {
+//        cin >> employee;
+//        cout << "Please loggin to see your account details! " << endl;
+//        cout << "Introduce username: " << endl;
+//        cin >> username;
+//        cout << "Introduce password: " << endl;
+//        cin >> password;
+//        if (employee.validation_input(username, password)) {
+//            cout << "Authentification successfull!" << endl;
+//            cout << "---Account details---" << endl;
+//            cout << employee;
+//            //employee.greeting_user(); says it is protected but
+//
+//            cout << "----------------\n" << endl;
+//            /////////////////////////////////////////////////////////////
+//            cout << "Employee Menu: " << endl;
+//            cout << "\n1.Add an Event" << endl;
+//            cout << "2.Display a list of Events" << endl;
+//            cout << "3.Delete an Event" << endl;
+//            cout << "4.EXIT 0";
+//        }
+//    }
+//
 
 
     /// For testing, you may skip this section
@@ -767,49 +768,34 @@ int main() {
     /**Downcasting:
      * using dynamic_cast
      * */
+    try {
+        Product* prod;
 
+        int buy_option;
+        cout << "What discount card you have?    0 - BooksExpress  ||   1 - OfficeExpress";
+        cin >> buy_option;
+        if (buy_option == 0)
+            prod = new Book("The Great Gatsby", "F. Scott Fitzgerald", 200, 10, 5);
+        else if (buy_option == 1)
+            prod = new OfficeSupplies("Set of pencils", 70, 20, 1);
+        else {
+            cout << "Make sure you've introduced the correct number!" << endl;
+            return 0;
+        }
+        cout << "Buy the book  -  1     ||    Buy the pencils   -   0";
+        cin >> buy_option;
+        if (buy_option == 1 && dynamic_cast<Book*>(prod))
+            cout << "Congrats! You bought a book with only " << prod->calculateShippingCost() << " $" << endl;
+        else if (buy_option == 0 && dynamic_cast<OfficeSupplies*>(prod))
+            cout << "Congrats! You bought pencils with only " << prod->calculateShippingCost() << " $" << endl;
+        else throw runtime_error("Can't buy books having OfficeExpress card and pencils having BooksExpress card!");
+    } catch (runtime_error& error) {
+        cout << error.what() << endl;
+    }
 
     /**Exception handling:
      * */
-//    try {
-//        Book bookEx("aaa", "aaaa", -333, 33, 33);
-//    }
-//    catch (const IllegallPriceExpt &ex) {
-//        cout << ex.what() << "\n";
-//    }
-//    OfficeSupplies offsup("pix", 23, 40, 1645);
-//    int temporary;
-//
-//    try {
-//        offsup.calculateTax();
-//    }
-//    catch (const IllegalTaxExpt &ex) {
-//        cout << ex.what() << endl;
-//
-//        temporary = offsup.getTax() / 10;
-//        offsup.setTax(temporary);
-//
-//        temporary = offsup.getTax();
-//        cout << "The new truncated tax is " << temporary << endl;
-//
-//        try {
-//            if (temporary > 100) { throw temporary; }
-//        }
-//        catch(int temp) {
-//            cout << "Truncation failed! " << endl;
-//            bool tax_tracker = false;
-//
-//            while(!tax_tracker) {
-//                cout << "Set new value for tax: " << endl;
-//                cin >> temporary;
-//                if (temporary < 100) {
-//                    offsup.setTax(temporary);
-//                    cout << "New tax has been set: " << offsup.getTax() << endl;
-//                    tax_tracker = true;
-//                }
-//            }
-//        }
-//    }
+
 
     /**Static testing:
      * */

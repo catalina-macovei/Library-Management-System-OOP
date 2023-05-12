@@ -1,10 +1,8 @@
 #include <iostream>
 #include <cstring>
 #include <string>
-#include <cmath>
 #include <vector>
-#include <list>
-#include <algorithm>
+
 using namespace std;
 
 class MyString {
@@ -168,11 +166,9 @@ double Book::calculateTax() const {
     return discountedPrice() * tax / 100;
 }
 ostream& operator<<(ostream& out, const Book& book) {
-    out << "Title: " << book.title << endl;
+    out << "Book Title: " << book.title << endl;
     out << "Author: " << book.author << endl;
-    out << "Price: " << book.gross_price << " lei" << endl;
-    out << "The shipping price: " << book.calculateShippingCost() << " lei" << endl;
-    out << "The tax for this product is " << book.calculateTax() << " lei" << endl;
+    out << "Final Price: " << book.gross_price << " lei" << endl;
     return out;
 }
 Book& Book::operator=(const Book& book) {
@@ -276,6 +272,8 @@ ostream& operator<<(ostream& out, const OfficeSupplies& supp) {
     out << "The tax for this product is " << supp.calculateTax() << " lei" << endl;
     return out;
 }
+
+
 
 /**Class User:
  * defined to set a password and a user name for users of bookstore app:
@@ -615,136 +613,245 @@ double Campanie::calculateTotalExpenses() {
     total = getPremium() + getCsponsorship() + getDsponsorhip() + getDonationExp();
     return  total;
 }
+void display_sum(int sum) {
+    cout << "The allocated budget for events is: " << sum << endl;
+}
+
+template<typename Book>
+class Stock {
+private:
+    vector<Book> orderItems;
+    double totalPrice;
+    int n;
+public:
+    Stock() {
+        totalPrice = 0;
+    }
+
+    vector<Book> addItem(Book book) {
+        orderItems.push_back(book);
+        totalPrice += book.getPrice();
+        return orderItems;
+    }
+
+    void displayItems() {
+        for (int i = 0; i < n; i++)
+            cout << i + 1 << ". " << orderItems[i];
+        cout << "\nTotal revenue for all: " << totalPrice << " lei" << endl;
+    }
+
+    double getTotalPrice() {
+        return totalPrice;
+    }
+
+    int setNrItems(int nset) {
+        n = nset;
+    }
+};
 
 int main() {
-//    bool set_default = false;
-//    char repeat = 'Y';
-//    string username = "";
-//    string password = "";
-//    bool account_option;
-//
-//    Employee employee("", "", 5000);
-//    Book  book1("Padurea Spanzuratilor", "Liviu Rebreanu", 233, 20, 5);
-//    Customer customer("Radu Valentin",  1);
-//    cout << "\nChoose an account type:    0-Customer  |   1-Employee\n";
-//    cin >> account_option;
-//    if (account_option == 0) {
-//        cin >> customer;
-//        cout << "Please loggin to see your account details! " << endl;
-//        cout << "Introduce username: " << endl;
-//        cin >> username;
-//        cout << "Introduce password: " << endl;
-//        cin >> password;
-//        if (customer.validation_input(username, password)) {
-//            cout << "Authentification successfull!" << endl;
-//            cout << "---Account details---" << endl;
-//            cout << customer;
-//            cout << "nr of orders: " << customer.getNrOrders() << endl;
-//            cout << "----------------\n" << endl;
-//        }
-//    } else if (account_option == 1) {
-//        cin >> employee;
-//        cout << "Please loggin to see your account details! " << endl;
-//        cout << "Introduce username: " << endl;
-//        cin >> username;
-//        cout << "Introduce password: " << endl;
-//        cin >> password;
-//        if (employee.validation_input(username, password)) {
-//            cout << "Authentification successfull!" << endl;
-//            cout << "---Account details---" << endl;
-//            cout << employee;
-//            //employee.greeting_user(); says it is protected but
-//
-//            cout << "----------------\n" << endl;
-//            /////////////////////////////////////////////////////////////
-//            cout << "Employee Menu: " << endl;
-//            cout << "\n1.Add an Event" << endl;
-//            cout << "2.Display a list of Events" << endl;
-//            cout << "3.Delete an Event" << endl;
-//            cout << "4.EXIT 0";
-//        }
-//    }
-//
+    bool set_default = false;
+    char repeat = 'Y';
+    string username = "";
+    string password = "";
+    bool account_option;
+    int nr_books;
+    Book  book1("Padurea Spanzuratilor", "Liviu Rebreanu", 233, 20, 5);
+    Book  book2("Strainul", "Albert Camus", 110, 20, 5);
+    Book  book3("Conditia umana", "Andre Malraux", 200, 20, 5);
+
+    Stock<Book> books;
+    books.setNrItems(3);
+    books.addItem(book1);
+    books.addItem(book2);
+    books.addItem(book3);
+    books.displayItems();
+
+    Employee employee("", "", 5000);
+
+    Customer customer("Radu Valentin",  1);
+    cout << "\nChoose an account type:    0-Customer  |   1-Employee\n";
+    cin >> account_option;
+    if (account_option == 0) {
+        cin >> customer;
+        cout << "Please loggin to see your account details! " << endl;
+        cout << "Introduce username: " << endl;
+        cin >> username;
+        cout << "Introduce password: " << endl;
+        cin >> password;
+        if (customer.validation_input(username, password)) {
+            cout << "Authentification successfull!" << endl;
+            cout << "---Account details---" << endl;
+            cout << customer;
+            cout << "nr of orders: " << customer.getNrOrders() << endl;
+            cout << "----------------\n" << endl;
+
+            /**Downcasting:
+             * using dynamic_cast
+             * */
+            Product* prod;
+            try {
+                int buy_option;
+
+                cout << "What discount card you have?    0 - BooksExpress  ||   1 - OfficeExpress";
+                cin >> buy_option;
+
+                if (buy_option == 0)
+                    prod = new Book("The Great Gatsby", "F. Scott Fitzgerald", 200, 10, 5);
+                else if (buy_option == 1)
+                    prod = new OfficeSupplies("Set of pencils", 70, 20, 1);
+                else {
+                    cout << "Make sure you've introduced the correct number!" << endl;
+                    return 0;
+                }
+                cout << "Buy the book  -  1     ||    Buy the pencils   -   0";
+                cin >> buy_option;
+                if (buy_option == 1 && dynamic_cast<Book*>(prod))
+                    cout << "Congrats! You bought a book with only " << prod->calculateShippingCost() << " $" << endl;
+                else if (buy_option == 0 && dynamic_cast<OfficeSupplies*>(prod))
+                    cout << "Congrats! You bought pencils with only " << prod->calculateShippingCost() << " $" << endl;
+                else throw runtime_error("Can't buy books having OfficeExpress card and pencils having BooksExpress card!");
+            } catch (runtime_error& error) {
+                cout << error.what() << endl;
+            }
+            if (prod != NULL) {
+                delete prod;
+            }
+
+        }
+    } else if (account_option == 1) {
+        cin >> employee;
+        cout << "Please loggin to see your account details! " << endl;
+        cout << "Introduce username: " << endl;
+        cin >> username;
+        cout << "Introduce password: " << endl;
+        cin >> password;
+        if (employee.validation_input(username, password)) {
+            cout << "Authentification successfull!" << endl;
+            cout << "---Account details---" << endl;
+            cout << employee;
+            cout << "----------------\n" << endl;
+            /////////////////////////////////////////////////////////////
+            cout << "Employee Menu: " << endl;
+            cout << "\n1.Add an Event" << endl;
+            cout << "2.Display a list of Events" << endl;
+            cout << "3.Delete an Event" << endl;
+            cout << "4.EXIT 0";
 
 
-    /// For testing, you may skip this section
-//    cout << "Testing Book:" << endl;
-//    cout << book1 << endl;
-//    cout << "Testing customer:" << endl;
-//    cout << customer << endl;
-//    cout << "Testing employee:" << endl;
-//    cout << employee << endl;
-
-
-    /**DYNAMIC DISPATCH on class Event:
+            /**DYNAMIC DISPATCH on class Event:
      * Make sure you have defined a virtual function in your base class
      * Override keyword after function definition in derived class
      * Voila! Dynamic dispatch - the mechanism to choose at runtime the correct function is done
      * To actually call that matches the data type of your object
      * */
-//    int n = 0;
-//    vector<Event*> evs;
-//
-//    cout << "\nHow many events you want to create? " << endl; cin >> n;
-//    for (int i = 0; i < n; ++i) {
-//        string ev_name;
-//        int ev_expenses;
-//        int ev_sponsorship;
-//        int option = 0;
-//
-//        cout << "What kind of event you want to introduce? " << endl;
-//        cout << "1.Donation" << endl;
-//        cout << "2.Contest" << endl;
-//        cout << "3.Campain" << endl;
-//        cin >> option;
-//        cout << "What's the event name? " << endl;
-//        cin >> ev_name;
-//        switch (option) {
-//            case 1: {
-//                evs.push_back(new Donatie);
-//                cout << "Write the budget for Donation expenses: " << endl;
-//                cin >> ev_expenses;
-//                cout << "Write the value of sponsorhip money: " << endl;
-//                cin >> ev_sponsorship;
-//                evs[i]->UpdateAll(ev_name, ev_expenses, ev_sponsorship, 0,0);
-//                break;
-//            }
-//            case 2: {
-//                evs.push_back(new Concurs);
-//                cout << "Write the budget for Contest expenses: " << endl;
-//                cin >> ev_expenses;
-//                cout << "Write the value for Grand Premium: " << endl;
-//                cin >> ev_sponsorship;
-//                evs[i]->UpdateAll(ev_name, ev_expenses, ev_sponsorship, 0,0);
-//                break;
-//            }
-//            case 3: {
-//                int con_expenses, con_premium;
-//                evs.push_back(new Campanie);
-//                cout << "Write the budget for Donation expenses from Campain: " << endl;
-//                cin >> ev_expenses;
-//                cout << "Write the value of sponsorhip money: " << endl;
-//                cin >> ev_sponsorship;
-//                cout << "Write the reserved budget for Contest: " << endl;
-//                cin >> con_expenses;
-//                cout << "Write the value for Grand Premium of Campain: " << endl;
-//                cin >> con_premium;
-//                evs[i]->UpdateAll(ev_name, ev_expenses, ev_sponsorship, con_expenses, con_premium);
-//                evs[i]->setEventName(ev_name);
-//                break;
-//            }
-//        }
-//    }
-//    for (int i = 0; i < evs.size(); ++i) {
-//        evs[i]->showEventName();
-//        cout << evs[i]->calculateTotalExpenses() << endl;
-//    }
-//
-//    for (int i = 0; i < evs.size(); ++i) {
-//        if (evs[i] != NULL) {
-//            delete evs[i];
-//        }
-//    }
+            int n = 0;
+            vector<Event*> evs;
+
+            cout << "\nHow many events you want to create? " << endl; cin >> n;
+            for (int i = 0; i < n; ++i) {
+                string ev_name;
+                int ev_expenses;
+                int ev_sponsorship;
+                int option = 0;
+
+                cout << "What kind of event you want to introduce? " << endl;
+                cout << "1.Donation" << endl;
+                cout << "2.Contest" << endl;
+                cout << "3.Campain" << endl;
+                cin >> option;
+                cout << "What's the event name? " << endl;
+                cin >> ev_name;
+                switch (option) {
+                    case 1: {
+                        evs.push_back(new Donatie);
+                        cout << "Write the budget for Donation expenses: " << endl;
+                        cin >> ev_expenses;
+                        cout << "Write the value of sponsorhip money: " << endl;
+                        cin >> ev_sponsorship;
+                        evs[i]->UpdateAll(ev_name, ev_expenses, ev_sponsorship, 0,0);
+                        break;
+                    }
+                    case 2: {
+                        evs.push_back(new Concurs);
+                        cout << "Write the budget for Contest expenses: " << endl;
+                        cin >> ev_expenses;
+                        cout << "Write the value for Grand Premium: " << endl;
+                        cin >> ev_sponsorship;
+                        evs[i]->UpdateAll(ev_name, ev_expenses, ev_sponsorship, 0,0);
+                        break;
+                    }
+                    case 3: {
+                        int con_expenses, con_premium;
+                        evs.push_back(new Campanie);
+                        cout << "Write the budget for Donation expenses from Campain: " << endl;
+                        cin >> ev_expenses;
+                        cout << "Write the value of sponsorhip money: " << endl;
+                        cin >> ev_sponsorship;
+                        cout << "Write the reserved budget for Contest: " << endl;
+                        cin >> con_expenses;
+                        cout << "Write the value for Grand Premium of Campain: " << endl;
+                        cin >> con_premium;
+                        evs[i]->UpdateAll(ev_name, ev_expenses, ev_sponsorship, con_expenses, con_premium);
+                        evs[i]->setEventName(ev_name);
+                        break;
+                    }
+                }
+            }
+            for (int i = 0; i < evs.size(); ++i) {
+                evs[i]->showEventName();
+                cout << evs[i]->calculateTotalExpenses() << endl;
+            }
+
+            for (int i = 0; i < evs.size(); ++i) {
+                if (evs[i] != NULL) {
+                    delete evs[i];
+                }
+            }
+        }
+    }
+
+    /**Exception handling:
+        * */
+    try {
+        Book bookEx("aaa", "aaaa", -333, 33, 33);
+    }
+    catch (const IllegallPriceExpt &ex) {
+        cout << ex.what() << "\n";
+    }
+    OfficeSupplies offsup("pix", 23, 40, 1645);
+    int temporary;
+
+    try {
+        offsup.calculateTax();
+    }
+    catch (const IllegalTaxExpt &ex) {
+        cout << ex.what() << endl;
+
+        temporary = offsup.getTax() / 10;
+        offsup.setTax(temporary);
+
+        temporary = offsup.getTax();
+        cout << "The new truncated tax is " << temporary << endl;
+
+        try {
+            if (temporary > 100) { throw temporary; }
+        }
+        catch(int temp) {
+            cout << "Truncation failed! " << endl;
+            bool tax_tracker = false;
+
+            while(!tax_tracker) {
+                cout << "Set new value for tax: " << endl;
+                cin >> temporary;
+                if (temporary < 100) {
+                    offsup.setTax(temporary);
+                    cout << "New tax has been set: " << offsup.getTax() << endl;
+                    tax_tracker = true;
+                }
+            }
+        }
+    }
 
      /**Upcasting :
       * */
@@ -763,43 +870,6 @@ int main() {
 //    cout << prod2->calculateShippingCost() << " lei" << endl;
 //    cout << "Discounted price " << prod2->discountedPrice() << " lei" << endl;
 //    cout << "Tax value:  " << prod2->calculateTax() << " lei" << endl;
-
-
-    /**Downcasting:
-     * using dynamic_cast
-     * */
-    try {
-        Product* prod;
-
-        int buy_option;
-        cout << "What discount card you have?    0 - BooksExpress  ||   1 - OfficeExpress";
-        cin >> buy_option;
-        if (buy_option == 0)
-            prod = new Book("The Great Gatsby", "F. Scott Fitzgerald", 200, 10, 5);
-        else if (buy_option == 1)
-            prod = new OfficeSupplies("Set of pencils", 70, 20, 1);
-        else {
-            cout << "Make sure you've introduced the correct number!" << endl;
-            return 0;
-        }
-        cout << "Buy the book  -  1     ||    Buy the pencils   -   0";
-        cin >> buy_option;
-        if (buy_option == 1 && dynamic_cast<Book*>(prod))
-            cout << "Congrats! You bought a book with only " << prod->calculateShippingCost() << " $" << endl;
-        else if (buy_option == 0 && dynamic_cast<OfficeSupplies*>(prod))
-            cout << "Congrats! You bought pencils with only " << prod->calculateShippingCost() << " $" << endl;
-        else throw runtime_error("Can't buy books having OfficeExpress card and pencils having BooksExpress card!");
-    } catch (runtime_error& error) {
-        cout << error.what() << endl;
-    }
-
-    /**Exception handling:
-     * */
-
-
-    /**Static testing:
-     * */
-
 
     return 0;
 }

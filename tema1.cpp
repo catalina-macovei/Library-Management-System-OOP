@@ -68,7 +68,7 @@ MyString::~MyString() { //daca nu e null deja
 
 /** Exeption:
  * */
-class IllegallPriceExpt : public std::exception {
+class IllegallPriceExpt : public exception {
 public:
     const char* what() const throw () {
         return "\nIllegal price exception\n";
@@ -103,8 +103,8 @@ Product::~Product() {}
  * Aici voi pastra datele pentru fiecare carte sub forma (titlu, autor, pret)
  * */
 class Book : public Product {
-    MyString title;
-    MyString author;
+    string title;
+    string author;
     int gross_price;
     int discount;
     int tax;
@@ -112,27 +112,30 @@ public:
     Book();
     ~Book();
 
-    Book(const MyString title1, const MyString author1, int gross_price1, int discount, int tax);
+    Book(string title1, string author1, int gross_price1);
 
     friend ostream &operator<<(ostream &out, const Book &new_book);
+
+    friend istream& operator>>(istream& in, Book& book);
 
     Book(const Book &book);
 
     Book &operator=(const Book &book);
 
     /// Getters down here!
-    const MyString getTitle()  const;
+    string getTitle()  const;
 
-    const MyString getAuthor() const;
+    string getAuthor() const;
 
     int getPrice() const; //mystring ref
 
     /// Setters down here!
-    void setTitle(const MyString title_set);
+    void setTitle(string title_set);
 
-    void setAuthor(const MyString author_set);
+    void setAuthor(string author_set);
 
     void setPrice(int gross_price_set);
+    void setTax(int setter_tax);
 
     virtual double calculateShippingCost() const;
 
@@ -141,34 +144,37 @@ public:
     virtual double discountedPrice() const;
 };
 
-Book::Book() : title(NULL), author(NULL), Product()  {}
+Book::Book() : title(""), author(""), Product()  {}
 
-Book::Book(const MyString title1, const MyString author1, int gross_price1, int discount1, int tax1)
-    : gross_price(gross_price1), title(title1), author(author1), discount(discount1), tax(tax1), Product()
+Book::Book(string title1, string author1, int gross_price1)
+    : gross_price(gross_price1), title(title1), author(author1), discount(10), tax(5), Product()
     {
-        if (gross_price1 < 0) {
-            throw IllegallPriceExpt ();
-        }
     }
+
 
 Book::~Book() {}
 
 double Book::discountedPrice() const {
+
     return gross_price - gross_price * discount / 100;
 }
 
+void Book::setTax(int setter_tax) {
+    if (setter_tax > 100) { throw IllegalTaxExpt(); }
+    tax = setter_tax;
+}
 double Book::calculateShippingCost() const {
     cout << "\nShipping Cost is: ";
     return discountedPrice() + calculateTax();
 }
 
 double Book::calculateTax() const {
+
     return discountedPrice() * tax / 100;
 }
 ostream& operator<<(ostream& out, const Book& book) {
     out << "Book Title: " << book.title << endl;
-    out << "Author: " << book.author << endl;
-    out << "Final Price: " << book.gross_price << " lei" << endl;
+    out << "Final Price: " << book.calculateShippingCost() << " lei" << endl;
     return out;
 }
 Book& Book::operator=(const Book& book) {
@@ -189,19 +195,30 @@ Book::Book(const Book& book) {
     this->discount = book.discount;
     this->tax = book.tax;
 }
-const MyString Book::getTitle() const {
+string Book::getTitle() const {
     return title;
 }
-const MyString Book::getAuthor() const {
+string Book::getAuthor() const {
     return author;
 }
 int Book::getPrice() const {
     return gross_price;
 }
-void Book::setTitle(const MyString title_set) {
+istream& operator>>(istream& in, Book& book) {
+    cout << "Introduce the title: " << endl;
+    in >> book.title;
+    cout << endl;
+    cout << "Introduce the gross price: " << endl;
+    in >> book.gross_price;
+    if (book.gross_price < 0) {
+        throw IllegallPriceExpt ();
+    }
+    return in;
+}
+void Book::setTitle(string title_set) {
     title = title_set;
 }
-void Book::setAuthor(const MyString author_set) {
+void Book::setAuthor(string author_set) {
     author = author_set;
 }
 void Book::setPrice(int price_set) {
@@ -338,6 +355,7 @@ public:
     string getName() const;
 
     bool validation_input(string us, string pas);
+
     static int counter();
 };
 int Customer::contor = 1000;
@@ -402,8 +420,7 @@ private:
     int salary;
 protected:
     static int contor;
-    // salary can't be increased from main
-    void increaseSalary(double percent_increase);
+
     static int count();
 public:
     Employee();
@@ -483,11 +500,6 @@ int Employee::getSalary() const {
 
 void Employee::setSalary(int salary_set) {
     salary = salary_set;
-}
-
-void Employee::increaseSalary(double percent_increase) {
-    double new_salary = getSalary() * (1 + percent_increase / 100);
-    setSalary(new_salary);
 }
 
 /**Class Event
@@ -617,10 +629,10 @@ void display_sum(int sum) {
     cout << "The allocated budget for events is: " << sum << endl;
 }
 
-template<typename Book>
+template<typename B>
 class Stock {
 private:
-    vector<Book> orderItems;
+    vector<B> orderItems;
     double totalPrice;
     int n;
 public:
@@ -628,7 +640,7 @@ public:
         totalPrice = 0;
     }
 
-    vector<Book> addItem(Book book) {
+    vector<B> addItem(Book book) {
         orderItems.push_back(book);
         totalPrice += book.getPrice();
         return orderItems;
@@ -650,22 +662,9 @@ public:
 };
 
 int main() {
-    bool set_default = false;
-    char repeat = 'Y';
     string username = "";
     string password = "";
-    bool account_option;
-    int nr_books;
-    Book  book1("Padurea Spanzuratilor", "Liviu Rebreanu", 233, 20, 5);
-    Book  book2("Strainul", "Albert Camus", 110, 20, 5);
-    Book  book3("Conditia umana", "Andre Malraux", 200, 20, 5);
-
-    Stock<Book> books;
-    books.setNrItems(3);
-    books.addItem(book1);
-    books.addItem(book2);
-    books.addItem(book3);
-    books.displayItems();
+    int account_option;
 
     Employee employee("", "", 5000);
 
@@ -697,7 +696,7 @@ int main() {
                 cin >> buy_option;
 
                 if (buy_option == 0)
-                    prod = new Book("The Great Gatsby", "F. Scott Fitzgerald", 200, 10, 5);
+                    prod = new Book("The Great Gatsby", "F. Scott Fitzgerald", 200);
                 else if (buy_option == 1)
                     prod = new OfficeSupplies("Set of pencils", 70, 20, 1);
                 else {
@@ -710,7 +709,7 @@ int main() {
                     cout << "Congrats! You bought a book with only " << prod->calculateShippingCost() << " $" << endl;
                 else if (buy_option == 0 && dynamic_cast<OfficeSupplies*>(prod))
                     cout << "Congrats! You bought pencils with only " << prod->calculateShippingCost() << " $" << endl;
-                else throw runtime_error("Can't buy books having OfficeExpress card and pencils having BooksExpress card!");
+                else throw runtime_error("Can't buy books having OfficeExpress card and pencils having BooksExpress card!>> See you next time! ");
             } catch (runtime_error& error) {
                 cout << error.what() << endl;
             }
@@ -732,12 +731,11 @@ int main() {
             cout << employee;
             cout << "----------------\n" << endl;
             /////////////////////////////////////////////////////////////
+            account_option = -1;
             cout << "Employee Menu: " << endl;
-            cout << "\n1.Add an Event" << endl;
-            cout << "2.Display a list of Events" << endl;
-            cout << "3.Delete an Event" << endl;
-            cout << "4.EXIT 0";
-
+            cout << "\n1.Add an Events" << endl;
+            cout << "\n2.Add items in stock " << endl;
+            cin >> account_option;
 
             /**DYNAMIC DISPATCH on class Event:
      * Make sure you have defined a virtual function in your base class
@@ -746,112 +744,132 @@ int main() {
      * To actually call that matches the data type of your object
      * */
             int n = 0;
-            vector<Event*> evs;
+            if (account_option==1) {
+                vector<Event*> evs;
 
-            cout << "\nHow many events you want to create? " << endl; cin >> n;
-            for (int i = 0; i < n; ++i) {
-                string ev_name;
-                int ev_expenses;
-                int ev_sponsorship;
-                int option = 0;
+                cout << "\nHow many events you want to create? " << endl; cin >> n;
+                for (int i = 0; i < n; ++i) {
+                    string ev_name;
+                    int ev_expenses;
+                    int ev_sponsorship;
+                    int option = 0;
 
-                cout << "What kind of event you want to introduce? " << endl;
-                cout << "1.Donation" << endl;
-                cout << "2.Contest" << endl;
-                cout << "3.Campain" << endl;
-                cin >> option;
-                cout << "What's the event name? " << endl;
-                cin >> ev_name;
-                switch (option) {
-                    case 1: {
-                        evs.push_back(new Donatie);
-                        cout << "Write the budget for Donation expenses: " << endl;
-                        cin >> ev_expenses;
-                        cout << "Write the value of sponsorhip money: " << endl;
-                        cin >> ev_sponsorship;
-                        evs[i]->UpdateAll(ev_name, ev_expenses, ev_sponsorship, 0,0);
-                        break;
-                    }
-                    case 2: {
-                        evs.push_back(new Concurs);
-                        cout << "Write the budget for Contest expenses: " << endl;
-                        cin >> ev_expenses;
-                        cout << "Write the value for Grand Premium: " << endl;
-                        cin >> ev_sponsorship;
-                        evs[i]->UpdateAll(ev_name, ev_expenses, ev_sponsorship, 0,0);
-                        break;
-                    }
-                    case 3: {
-                        int con_expenses, con_premium;
-                        evs.push_back(new Campanie);
-                        cout << "Write the budget for Donation expenses from Campain: " << endl;
-                        cin >> ev_expenses;
-                        cout << "Write the value of sponsorhip money: " << endl;
-                        cin >> ev_sponsorship;
-                        cout << "Write the reserved budget for Contest: " << endl;
-                        cin >> con_expenses;
-                        cout << "Write the value for Grand Premium of Campain: " << endl;
-                        cin >> con_premium;
-                        evs[i]->UpdateAll(ev_name, ev_expenses, ev_sponsorship, con_expenses, con_premium);
-                        evs[i]->setEventName(ev_name);
-                        break;
+                    cout << "What kind of event you want to introduce? " << endl;
+                    cout << "1.Donation" << endl;
+                    cout << "2.Contest" << endl;
+                    cout << "3.Campain" << endl;
+                    cin >> option;
+                    cout << "What's the event name? " << endl;
+                    cin >> ev_name;
+                    switch (option) {
+                        case 1: {
+                            evs.push_back(new Donatie);
+                            cout << "Write the budget for Donation expenses: " << endl;
+                            cin >> ev_expenses;
+                            cout << "Write the value of sponsorhip money: " << endl;
+                            cin >> ev_sponsorship;
+                            evs[i]->UpdateAll(ev_name, ev_expenses, ev_sponsorship, 0,0);
+                            break;
+                        }
+                        case 2: {
+                            evs.push_back(new Concurs);
+                            cout << "Write the budget for Contest expenses: " << endl;
+                            cin >> ev_expenses;
+                            cout << "Write the value for Grand Premium: " << endl;
+                            cin >> ev_sponsorship;
+                            evs[i]->UpdateAll(ev_name, ev_expenses, ev_sponsorship, 0,0);
+                            break;
+                        }
+                        case 3: {
+                            int con_expenses, con_premium;
+                            evs.push_back(new Campanie);
+                            cout << "Write the budget for Donation expenses from Campain: " << endl;
+                            cin >> ev_expenses;
+                            cout << "Write the value of sponsorhip money: " << endl;
+                            cin >> ev_sponsorship;
+                            cout << "Write the reserved budget for Contest: " << endl;
+                            cin >> con_expenses;
+                            cout << "Write the value for Grand Premium of Campain: " << endl;
+                            cin >> con_premium;
+                            evs[i]->UpdateAll(ev_name, ev_expenses, ev_sponsorship, con_expenses, con_premium);
+                            evs[i]->setEventName(ev_name);
+                            break;
+                        }
                     }
                 }
-            }
-            for (int i = 0; i < evs.size(); ++i) {
-                evs[i]->showEventName();
-                cout << evs[i]->calculateTotalExpenses() << endl;
+                for (int i = 0; i < evs.size(); ++i) {
+                    evs[i]->showEventName();
+                    cout << evs[i]->calculateTotalExpenses() << endl;
+                }
+
+                for (int i = 0; i < evs.size(); ++i) {
+                    if (evs[i] != NULL) {
+                        delete evs[i];
+                    }
+                }
+            }   else if(account_option == 2) {
+                int nr_books;
+
+                    Stock<Book> books;
+                    Book book;
+                    cout << "How many books you want to add? " <<  endl;
+                    cin >> nr_books;
+                    books.setNrItems(nr_books);
+                    for (int i = 0; i<nr_books;i++) {
+                        bool ok;
+                        int new_tax;
+                        try {
+                        cin >> book;
+                        }
+                        catch (const IllegallPriceExpt &ex) {
+                            int new_price;
+                            bool price_tracker = false;
+                            cout << ex.what() << "\n";
+                            while (!price_tracker) {
+                                cout << "Please introduce a valid value for price (>0) " << endl;
+                                cin >> new_price;
+                                if(new_price > 0) {
+                                    book.setPrice(new_price);
+                                    price_tracker = true;
+                                }
+                            }
+                        }
+                        cout << "Want to use the default tax 5% or custom it? " << endl;
+                        cin >> ok;
+                        if (ok) {
+                            cout << "introduce new tax :  " << endl;
+                            cin >> new_tax; /// need set tax setter
+                            try {
+                                book.setTax(new_tax);
+                            }
+                            catch (const IllegalTaxExpt &ex) {
+                                cout << ex.what() << endl;
+
+                                bool tax_tracker = false;
+
+                                while(!tax_tracker) {
+                                        cout << "Set another value for tax: " << endl;
+                                        cin >> new_tax;
+                                        if (new_tax < 100) {
+                                            book.setTax(new_tax);
+                                            cout << "New tax has been set: " << new_tax << endl;
+                                            tax_tracker = true;
+                                        }
+                                    }
+                                }
+                            }
+                        books.addItem(book);
+                    }
+                    cout << "Congrats! You've added " << nr_books << " books!" << endl;
+                    books.displayItems();
+
             }
 
-            for (int i = 0; i < evs.size(); ++i) {
-                if (evs[i] != NULL) {
-                    delete evs[i];
-                }
-            }
         }
     }
 
     /**Exception handling:
         * */
-    try {
-        Book bookEx("aaa", "aaaa", -333, 33, 33);
-    }
-    catch (const IllegallPriceExpt &ex) {
-        cout << ex.what() << "\n";
-    }
-    OfficeSupplies offsup("pix", 23, 40, 1645);
-    int temporary;
-
-    try {
-        offsup.calculateTax();
-    }
-    catch (const IllegalTaxExpt &ex) {
-        cout << ex.what() << endl;
-
-        temporary = offsup.getTax() / 10;
-        offsup.setTax(temporary);
-
-        temporary = offsup.getTax();
-        cout << "The new truncated tax is " << temporary << endl;
-
-        try {
-            if (temporary > 100) { throw temporary; }
-        }
-        catch(int temp) {
-            cout << "Truncation failed! " << endl;
-            bool tax_tracker = false;
-
-            while(!tax_tracker) {
-                cout << "Set new value for tax: " << endl;
-                cin >> temporary;
-                if (temporary < 100) {
-                    offsup.setTax(temporary);
-                    cout << "New tax has been set: " << offsup.getTax() << endl;
-                    tax_tracker = true;
-                }
-            }
-        }
-    }
 
      /**Upcasting :
       * */

@@ -85,11 +85,11 @@ public:
 /**class Product:
  * it's abstract
  * this class will be inherited by two classes
- * it's an interface
+ * it's interface
  * */
 class Product {
 public:
-    Product();
+    Product();      //nu are sens
     virtual ~Product() = 0;
     virtual double calculateShippingCost() const = 0;       // pret cu reducere si taxa aplicata
     virtual double calculateTax() const = 0;                // pentru fiecare produs se achita un anumit procent din pret ca taxa (impozit)
@@ -148,9 +148,7 @@ Book::Book() : title(""), author(""), Product()  {}
 
 Book::Book(string title1, string author1, int gross_price1)
     : gross_price(gross_price1), title(title1), author(author1), discount(10), tax(5), Product()
-    {
-    }
-
+    {}
 
 Book::~Book() {}
 
@@ -418,7 +416,7 @@ private:
     string role;
     int id;
     int salary;
-protected:
+protected:    ///pot lasa private
     static int contor;
 
     static int count();
@@ -629,10 +627,10 @@ void display_sum(int sum) {
     cout << "The allocated budget for events is: " << sum << endl;
 }
 
-template<typename B>
+template<typename B>  // un templ p/u event, prod
 class Stock {
 private:
-    vector<B> orderItems;
+    vector<B> orderItems;       // prod pointeri unique_pointeri
     double totalPrice;
     int n;
 public:
@@ -730,7 +728,7 @@ int main() {
             cout << "---Account details---" << endl;
             cout << employee;
             cout << "----------------\n" << endl;
-            /////////////////////////////////////////////////////////////
+
             account_option = -1;
             cout << "Employee Menu: " << endl;
             cout << "\n1.Add an Events" << endl;
@@ -862,7 +860,6 @@ int main() {
                     }
                     cout << "Congrats! You've added " << nr_books << " books!" << endl;
                     books.displayItems();
-
             }
 
         }

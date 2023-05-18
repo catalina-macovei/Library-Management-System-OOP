@@ -2,6 +2,7 @@
 #include <cstring>
 #include <string>
 #include <vector>
+#include <memory>
 
 using namespace std;
 
@@ -627,264 +628,81 @@ void display_sum(int sum) {
     cout << "The allocated budget for events is: " << sum << endl;
 }
 
-template<typename B>  // un templ p/u event, prod
-class Stock {
+class Sponsor {
 private:
-    vector<B> orderItems;       // prod pointeri unique_pointeri
-    double totalPrice;
-    int n;
+    string name;
+    double sponsorshipAmount;
+
 public:
-    Stock() {
-        totalPrice = 0;
+    Sponsor(const string& name, double sponsorshipAmount) {
+        this->name = name;
+        this->sponsorshipAmount = sponsorshipAmount;
     }
 
-    vector<B> addItem(Book book) {
-        orderItems.push_back(book);
-        totalPrice += book.getPrice();
-        return orderItems;
-    }
-
-    void displayItems() {
-        for (int i = 0; i < n; i++)
-            cout << i + 1 << ". " << orderItems[i];
-        cout << "\nTotal revenue for all: " << totalPrice << " lei" << endl;
-    }
-
-    double getTotalPrice() {
-        return totalPrice;
-    }
-
-    int setNrItems(int nset) {
-        n = nset;
+    friend ostream& operator<<(ostream& os, const Sponsor& sponsor) {
+        os << "Sponsor Name: " << sponsor.name << endl;
+        os << "Sponsorship Amount: " << sponsor.sponsorshipAmount << endl;
+        return os;
     }
 };
 
-int main() {
-    string username = "";
-    string password = "";
-    int account_option;
+class Partner {
+private:
+    string name;
+    string partnershipType;
 
-    Employee employee("", "", 5000);
-
-    Customer customer("Radu Valentin",  1);
-    cout << "\nChoose an account type:    0-Customer  |   1-Employee\n";
-    cin >> account_option;
-    if (account_option == 0) {
-        cin >> customer;
-        cout << "Please loggin to see your account details! " << endl;
-        cout << "Introduce username: " << endl;
-        cin >> username;
-        cout << "Introduce password: " << endl;
-        cin >> password;
-        if (customer.validation_input(username, password)) {
-            cout << "Authentification successfull!" << endl;
-            cout << "---Account details---" << endl;
-            cout << customer;
-            cout << "nr of orders: " << customer.getNrOrders() << endl;
-            cout << "----------------\n" << endl;
-
-            /**Downcasting:
-             * using dynamic_cast
-             * */
-            Product* prod;
-            try {
-                int buy_option;
-
-                cout << "What discount card you have?    0 - BooksExpress  ||   1 - OfficeExpress";
-                cin >> buy_option;
-
-                if (buy_option == 0)
-                    prod = new Book("The Great Gatsby", "F. Scott Fitzgerald", 200);
-                else if (buy_option == 1)
-                    prod = new OfficeSupplies("Set of pencils", 70, 20, 1);
-                else {
-                    cout << "Make sure you've introduced the correct number!" << endl;
-                    return 0;
-                }
-                cout << "Buy the book  -  1     ||    Buy the pencils   -   0";
-                cin >> buy_option;
-                if (buy_option == 1 && dynamic_cast<Book*>(prod))
-                    cout << "Congrats! You bought a book with only " << prod->calculateShippingCost() << " $" << endl;
-                else if (buy_option == 0 && dynamic_cast<OfficeSupplies*>(prod))
-                    cout << "Congrats! You bought pencils with only " << prod->calculateShippingCost() << " $" << endl;
-                else throw runtime_error("Can't buy books having OfficeExpress card and pencils having BooksExpress card!>> See you next time! ");
-            } catch (runtime_error& error) {
-                cout << error.what() << endl;
-            }
-            if (prod != NULL) {
-                delete prod;
-            }
-
-        }
-    } else if (account_option == 1) {
-        cin >> employee;
-        cout << "Please loggin to see your account details! " << endl;
-        cout << "Introduce username: " << endl;
-        cin >> username;
-        cout << "Introduce password: " << endl;
-        cin >> password;
-        if (employee.validation_input(username, password)) {
-            cout << "Authentification successfull!" << endl;
-            cout << "---Account details---" << endl;
-            cout << employee;
-            cout << "----------------\n" << endl;
-
-            account_option = -1;
-            cout << "Employee Menu: " << endl;
-            cout << "\n1.Add an Events" << endl;
-            cout << "\n2.Add items in stock " << endl;
-            cin >> account_option;
-
-            /**DYNAMIC DISPATCH on class Event:
-     * Make sure you have defined a virtual function in your base class
-     * Override keyword after function definition in derived class
-     * Voila! Dynamic dispatch - the mechanism to choose at runtime the correct function is done
-     * To actually call that matches the data type of your object
-     * */
-            int n = 0;
-            if (account_option==1) {
-                vector<Event*> evs;
-
-                cout << "\nHow many events you want to create? " << endl; cin >> n;
-                for (int i = 0; i < n; ++i) {
-                    string ev_name;
-                    int ev_expenses;
-                    int ev_sponsorship;
-                    int option = 0;
-
-                    cout << "What kind of event you want to introduce? " << endl;
-                    cout << "1.Donation" << endl;
-                    cout << "2.Contest" << endl;
-                    cout << "3.Campain" << endl;
-                    cin >> option;
-                    cout << "What's the event name? " << endl;
-                    cin >> ev_name;
-                    switch (option) {
-                        case 1: {
-                            evs.push_back(new Donatie);
-                            cout << "Write the budget for Donation expenses: " << endl;
-                            cin >> ev_expenses;
-                            cout << "Write the value of sponsorhip money: " << endl;
-                            cin >> ev_sponsorship;
-                            evs[i]->UpdateAll(ev_name, ev_expenses, ev_sponsorship, 0,0);
-                            break;
-                        }
-                        case 2: {
-                            evs.push_back(new Concurs);
-                            cout << "Write the budget for Contest expenses: " << endl;
-                            cin >> ev_expenses;
-                            cout << "Write the value for Grand Premium: " << endl;
-                            cin >> ev_sponsorship;
-                            evs[i]->UpdateAll(ev_name, ev_expenses, ev_sponsorship, 0,0);
-                            break;
-                        }
-                        case 3: {
-                            int con_expenses, con_premium;
-                            evs.push_back(new Campanie);
-                            cout << "Write the budget for Donation expenses from Campain: " << endl;
-                            cin >> ev_expenses;
-                            cout << "Write the value of sponsorhip money: " << endl;
-                            cin >> ev_sponsorship;
-                            cout << "Write the reserved budget for Contest: " << endl;
-                            cin >> con_expenses;
-                            cout << "Write the value for Grand Premium of Campain: " << endl;
-                            cin >> con_premium;
-                            evs[i]->UpdateAll(ev_name, ev_expenses, ev_sponsorship, con_expenses, con_premium);
-                            evs[i]->setEventName(ev_name);
-                            break;
-                        }
-                    }
-                }
-                for (int i = 0; i < evs.size(); ++i) {
-                    evs[i]->showEventName();
-                    cout << evs[i]->calculateTotalExpenses() << endl;
-                }
-
-                for (int i = 0; i < evs.size(); ++i) {
-                    if (evs[i] != NULL) {
-                        delete evs[i];
-                    }
-                }
-            }   else if(account_option == 2) {
-                int nr_books;
-
-                    Stock<Book> books;
-                    Book book;
-                    cout << "How many books you want to add? " <<  endl;
-                    cin >> nr_books;
-                    books.setNrItems(nr_books);
-                    for (int i = 0; i<nr_books;i++) {
-                        bool ok;
-                        int new_tax;
-                        try {
-                        cin >> book;
-                        }
-                        catch (const IllegallPriceExpt &ex) {
-                            int new_price;
-                            bool price_tracker = false;
-                            cout << ex.what() << "\n";
-                            while (!price_tracker) {
-                                cout << "Please introduce a valid value for price (>0) " << endl;
-                                cin >> new_price;
-                                if(new_price > 0) {
-                                    book.setPrice(new_price);
-                                    price_tracker = true;
-                                }
-                            }
-                        }
-                        cout << "Want to use the default tax 5% or custom it? " << endl;
-                        cin >> ok;
-                        if (ok) {
-                            cout << "introduce new tax :  " << endl;
-                            cin >> new_tax; /// need set tax setter
-                            try {
-                                book.setTax(new_tax);
-                            }
-                            catch (const IllegalTaxExpt &ex) {
-                                cout << ex.what() << endl;
-
-                                bool tax_tracker = false;
-
-                                while(!tax_tracker) {
-                                        cout << "Set another value for tax: " << endl;
-                                        cin >> new_tax;
-                                        if (new_tax < 100) {
-                                            book.setTax(new_tax);
-                                            cout << "New tax has been set: " << new_tax << endl;
-                                            tax_tracker = true;
-                                        }
-                                    }
-                                }
-                            }
-                        books.addItem(book);
-                    }
-                    cout << "Congrats! You've added " << nr_books << " books!" << endl;
-                    books.displayItems();
-            }
-
-        }
+public:
+    Partner(const string& name, const string& partnershipType) {
+        this->name = name;
+        this->partnershipType = partnershipType;
     }
 
-    /**Exception handling:
-        * */
+    // Overloaded insertion operator
+    friend ostream& operator<<(ostream& os, const Partner& partner) {
+        os << "Partner Name: " << partner.name << endl;
+        os << "Partnership Type: " << partner.partnershipType << endl;
+        return os;
+    }
+};
 
-     /**Upcasting :
-      * */
-//
-//    Book  book3("Padurea Spanzuratilor", "Liviu Rebreanu", 233, 20, 5);
-//    Product* prod1 = &book3;
-//    cout <<"\nUpcasting done: " << endl;
-//    cout << prod1->calculateShippingCost() << " lei" << endl;
-//    cout << "Discounted price " << prod1->discountedPrice() << " lei" << endl;
-//    cout << "Tax value:  " << prod1->calculateTax() << " lei" << endl;
-//
-//
-//    OfficeSupplies office_sup("Carnet", 80, 25, 5);
-//    Product* prod2 = &office_sup;
-//    cout <<"\nUpcasting done: " << endl;
-//    cout << prod2->calculateShippingCost() << " lei" << endl;
-//    cout << "Discounted price " << prod2->discountedPrice() << " lei" << endl;
-//    cout << "Tax value:  " << prod2->calculateTax() << " lei" << endl;
+// Generic class for the Bussiness Relationship
+template<typename T>
+class BussinessRelationship {
+private:
+    vector<T> relations;
+
+public:
+    void addRelation(const T& object) {
+        relations.push_back(object);
+    }
+
+    void displayRelations() const {
+        for (const auto& object : relations) {
+            cout << object << endl;
+        }
+    }
+};
+
+
+
+int main() {
+
+    BussinessRelationship<Sponsor> sponsorBookstore;
+    sponsorBookstore.addRelation(Sponsor("ABC Company", 5000.0));
+    sponsorBookstore.addRelation(Sponsor("XYZ Corporation", 3000.0));
+    sponsorBookstore.addRelation(Sponsor("123 Enterprises", 2000.0));
+
+    BussinessRelationship<Partner> partnerBookstore;
+    partnerBookstore.addRelation(Partner("Company A", "Gold"));
+    partnerBookstore.addRelation(Partner("Company B", "Silver"));
+    partnerBookstore.addRelation(Partner("Company C", "Bronze"));
+
+    cout << "Sponsors:" << endl;
+    sponsorBookstore.displayRelations();
+
+    cout << "Partners:" << endl;
+    partnerBookstore.displayRelations();
+
 
     return 0;
 }

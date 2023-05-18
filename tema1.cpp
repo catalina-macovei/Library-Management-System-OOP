@@ -3,7 +3,8 @@
 #include <string>
 #include <vector>
 #include <memory>
-
+#include <algorithm>
+#include <numeric>
 using namespace std;
 
 class MyString {
@@ -644,6 +645,17 @@ public:
         os << "Sponsorship Amount: " << sponsor.sponsorshipAmount << endl;
         return os;
     }
+    // Comparison operator for sorting by sponsorship amount
+    bool operator<(const Sponsor& other) const {
+        return sponsorshipAmount < other.sponsorshipAmount;
+    }
+    // Overloading the + operator to sum sponsorshipAmount
+    friend int operator+(const Sponsor& lhs, const Sponsor& rhs) {
+        return lhs.sponsorshipAmount + rhs.sponsorshipAmount;
+    }
+    double getSponsorshipAmount() {
+        return sponsorshipAmount;
+    }
 };
 
 class Partner {
@@ -663,6 +675,10 @@ public:
         os << "Partnership Type: " << partner.partnershipType << endl;
         return os;
     }
+    // Custom comparison function to sort partners in alphabetical order
+    bool operator<(const Partner& other) const {
+        return name < other.name;
+    }
 };
 
 // Generic class for the Bussiness Relationship
@@ -681,9 +697,21 @@ public:
             cout << object << endl;
         }
     }
+    void UpdateRelationsList() {
+        sort(relations.begin(), relations.end());
+    }
 };
-
-
+// Template specialization for sorting sponsors by name and sponsorshipAmount and also calculate the total sponsorship amount
+template<>
+void BussinessRelationship<Sponsor>::UpdateRelationsList() {
+    sort(relations.begin(), relations.end());
+    double sum = 0;
+    for (const auto& object : relations) {
+        sum = sum + static_cast<Sponsor>(object).getSponsorshipAmount();
+    }
+    cout << "The total amount offered by sponsors is: " << sum << endl;
+    cout << endl;
+};
 
 int main() {
 
@@ -693,16 +721,21 @@ int main() {
     sponsorBookstore.addRelation(Sponsor("123 Enterprises", 2000.0));
 
     BussinessRelationship<Partner> partnerBookstore;
-    partnerBookstore.addRelation(Partner("Company A", "Gold"));
-    partnerBookstore.addRelation(Partner("Company B", "Silver"));
-    partnerBookstore.addRelation(Partner("Company C", "Bronze"));
+    partnerBookstore.addRelation(Partner("Company B", "Gold"));
+    partnerBookstore.addRelation(Partner("Company C", "Silver"));
+    partnerBookstore.addRelation(Partner("Company A", "Bronze"));
 
     cout << "Sponsors:" << endl;
     sponsorBookstore.displayRelations();
+    sponsorBookstore.UpdateRelationsList();
 
-    cout << "Partners:" << endl;
+    cout << "Sorted Sponsors (by sponsorship amount):" << endl;
+    sponsorBookstore.displayRelations();
+
+
+    cout << "Sorted Partners (by their name):" << endl;
+    partnerBookstore.UpdateRelationsList();
     partnerBookstore.displayRelations();
-
 
     return 0;
 }

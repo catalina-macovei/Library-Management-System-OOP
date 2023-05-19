@@ -4,7 +4,7 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
-#include <numeric>
+#include <regex>
 using namespace std;
 
 class MyString {
@@ -174,7 +174,7 @@ double Book::calculateTax() const {
 }
 ostream& operator<<(ostream& out, const Book& book) {
     out << "Book Title: " << book.title << endl;
-    out << "Final Price: " << book.calculateShippingCost() << " lei" << endl;
+    out << book.calculateShippingCost() << " lei" << endl;
     return out;
 }
 Book& Book::operator=(const Book& book) {
@@ -232,7 +232,7 @@ void Book::setPrice(int price_set) {
  * */
 
 class OfficeSupplies : public Product {
-    MyString name;
+    string name;
     int gross_price;
     int discount;
     int tax;
@@ -240,7 +240,7 @@ class OfficeSupplies : public Product {
 public:
     OfficeSupplies();
 
-    OfficeSupplies(const MyString &name1, int gross_price1, int discount1, int tax1);
+    OfficeSupplies( string name1, int gross_price1, int discount1, int tax1);
 
     friend ostream& operator<<(ostream& out, const OfficeSupplies& supp);
 
@@ -256,9 +256,9 @@ public:
 };
 
 OfficeSupplies::OfficeSupplies()
-                : name(NULL), gross_price(0), discount(0), tax(0), Product() {}
+                : name(""), gross_price(0), discount(0), tax(0), Product() {}
 
-OfficeSupplies::OfficeSupplies(const MyString &name1, int gross_price1, int discount1, int tax1)
+OfficeSupplies::OfficeSupplies(string name1, int gross_price1, int discount1, int tax1)
                 :   Product(), name(name1), gross_price(gross_price1), discount(discount1), tax(tax1)
                 {}
 
@@ -502,132 +502,114 @@ void Employee::setSalary(int salary_set) {
     salary = salary_set;
 }
 
-/**Class Event
- * Abstract
- * One pure virtual function
- * */
+/// FOR EVENTS:
 class Event {
-protected:
+private:
     string name;
-public:
-    Event();
-    Event(string name1);
-    virtual void showEventName() { cout << "Base:: showEventName() " << getName() << endl;};
-    virtual double calculateTotalExpenses() { cout << "Event total expenses:  0 "; return 0; };
-    virtual void UpdateAll(string name, int param1, int param2, int param3, int param4) = 0;
-    void setEventName(string name_set);
-    string getName() const;
-    virtual ~Event() = 0;
-};
-Event::Event() : name("hi") {}
-string Event::getName() const {
-    return name;
-}
-void Event::setEventName(string name_set) {
-    name = name_set;
-}
-Event::~Event() {}
-Event::Event(string name1) : name(name1) {}
-
-class Donatie : public virtual Event {
-    int donation_expenses;
-    int sponsorship;
-public:
-    Donatie();
-    Donatie(int donation_expenses1, int sponsorship1);
-    int getDonationExp() const;
-    int getDsponsorhip() const;
-    void showEventName() override { cout << "Donation name is: " << getName() << endl; };
-    void UpdateAll(string name, int expenses, int sponsorhips, int param3, int param4) override;
-    double calculateTotalExpenses() override;
-};
-
-Donatie::Donatie() : donation_expenses(0), sponsorship(0) {}
-
-Donatie::Donatie(int donation_expenses1, int sponsorship1)
-        : donation_expenses(donation_expenses1), sponsorship(sponsorship1) {}
-
-void Donatie::UpdateAll(string name, int expenses, int sponsorhips, int param3, int param4) {
-    this->name = name;
-    this->sponsorship = sponsorhips;
-    this->donation_expenses = expenses;
-}
-double Donatie::calculateTotalExpenses() {
-    double expenses = 0;
-    expenses = getDsponsorhip() + getDonationExp();
-    cout << "Donation total expenses:  ";
-    return expenses;
-}
-
-int Donatie::getDonationExp() const {
-    return donation_expenses;
-}
-
-
-int Donatie::getDsponsorhip() const {
-    return sponsorship;
-}
-
-
-class Concurs : public virtual Event {
-    int premium;    // the value of the premium in lei
-    int c_sponsorhip;       // what's the budget for organising the contest
-public:
-    Concurs();
-    Concurs(int premium1, int c_sponsorship1);
-    int getPremium() const;
-    int getCsponsorship() const;
-    void showEventName() override { cout << "Contest name is " << getName() << endl; };
-    void UpdateAll(string name, int expenses, int sponsorhips, int param3, int param4) override;
-    double calculateTotalExpenses() override { cout << "Contest total expenses:   "; return getCsponsorship() + getPremium(); };
-};
-
-Concurs::Concurs() : premium(0), c_sponsorhip(0) {}
-
-Concurs::Concurs(int premium1, int c_sponsorship1) : premium(premium1), c_sponsorhip(c_sponsorship1){}
-
-void Concurs::UpdateAll(string name, int expenses, int sponsorhips, int param3, int param4) {
-    this->name = name;
-    this->c_sponsorhip = sponsorhips;
-    this->premium = expenses;
-}
-
-int Concurs::getPremium() const {
-    return premium;
-}
-int Concurs::getCsponsorship() const {
-    return c_sponsorhip;
-}
-
-
-class Campanie : public Donatie, public Concurs{
+    string date;
+    string location;
+    string description;
 
 public:
-    Campanie();
-    Campanie(int premium1, int c_sponsorship1, int donation_expenses1, int sponsorship1);
-    void UpdateAll(string name, int expenses, int sponsorhips, int param3, int param4) override;
-    virtual void showEventName() { cout << "Campain name is " << getName() << endl; };
-    virtual double calculateTotalExpenses();
+    Event() {}
+
+    void setName(const string& name) {
+        this->name = name;
+    }
+
+    void setDate(const string& date) {
+        this->date = date;
+    }
+
+    void setLocation(const string& location) {
+        this->location = location;
+    }
+
+    void setDescription(const string& description) {
+        this->description = description;
+    }
+
+    friend ostream& operator<<(ostream& os, const Event& event) {
+
+        os << "Event: " << event.name << endl;
+        os << "Date: " << event.date << endl;
+        os << "Location: " << event.location << endl;
+        os << "Description: " << event.description << endl;
+        return os;
+    }
 };
-Campanie::Campanie() {}
 
-Campanie::Campanie(int premium1, int c_sponsorship1, int donation_expenses1, int sponsorship1) : Concurs(premium1, c_sponsorship1),Donatie(donation_expenses1, sponsorship1) {}
+// EventBuilder abstract class
+class EventBuilder {
+protected:
+    shared_ptr<Event> event;
 
-void Campanie::UpdateAll(string name, int expenses, int sponsorhips, int param3, int param4) {
-    this->name = name;
-    Donatie::UpdateAll("", expenses, sponsorhips, 0, 0);
-    Concurs::UpdateAll("", param3, param4, 0, 0);
-}
+public:
+    virtual void createEvent() = 0;
+    virtual void buildName(const string& name) = 0;
+    virtual void buildDate(const string& date) = 0;
+    virtual void buildLocation(const string& location) = 0;
+    virtual void buildDescription(const string& description) = 0;
+    virtual shared_ptr<Event> getEvent() = 0;
+};
 
-double Campanie::calculateTotalExpenses() {
-    double total = 0;
-    cout << "Campain total expenses: ";
-    total = getPremium() + getCsponsorship() + getDsponsorhip() + getDonationExp();
-    return  total;
-}
-void display_sum(int sum) {
-    cout << "The allocated budget for events is: " << sum << endl;
-}
+// CampaignBuilder concrete class
+class CampaignBuilder : public EventBuilder {
+public:
+    void createEvent() override {
+        event = make_shared<Event>();
+    }
+
+    void buildName(const string& name) override {
+        event->setName(name);
+    }
+
+    void buildDate(const string& date) override {
+        event->setDate(date);
+    }
+
+    void buildLocation(const string& location) override {
+        event->setLocation(location);
+    }
+
+    void buildDescription(const string& description) override {
+        event->setDescription(description);
+    }
+
+    shared_ptr<Event> getEvent() override {
+        return event;
+    }
+};
+
+// Manager class that defines the steps and order in which the builders should build the event
+class Manager {
+private:
+    vector<shared_ptr<Event>> events;
+    EventBuilder* eventBuilder;
+
+public:
+    void setEventBuilder(EventBuilder* builder) {
+        eventBuilder = builder;
+    }
+
+    void addEvent() {
+        events.push_back(eventBuilder->getEvent());
+    }
+
+    void constructEvent(const string& name, const string& date, const string& location, const string& description) {
+        eventBuilder->createEvent();
+        eventBuilder->buildName(name);
+        eventBuilder->buildDate(date);
+        eventBuilder->buildLocation(location);
+        eventBuilder->buildDescription(description);
+        addEvent();
+    }
+
+    const vector<shared_ptr<Event>>& getEvents() const {
+        return events;
+    }
+};
+
 
 class Sponsor {
 private:
@@ -679,6 +661,17 @@ public:
     bool operator<(const Partner& other) const {
         return name < other.name;
     }
+    bool operator==(const Partner& other) const {
+        return name == other.name && partnershipType == other.partnershipType;
+    }
+
+    bool operator!=(const Partner& other) const {
+        return !(*this == other);
+    }
+
+    string getPartnershipType() const {
+        return partnershipType;
+    }
 };
 
 // Generic class for the Bussiness Relationship
@@ -700,6 +693,26 @@ public:
     void UpdateRelationsList() {
         sort(relations.begin(), relations.end());
     }
+
+    typename vector<T>::iterator findPartnerByType(const string& partnershipType) {
+        return find_if(relations.begin(), relations.end(), [&](const T& partner) {
+            return partner.getPartnershipType() == partnershipType;
+        });
+    }
+
+    bool hasPartnerByType(const string& partnershipType) {
+        return findPartnerByType(partnershipType) != relations.end();
+    }
+
+    void printPartnerByType(const string& partnershipType) {
+        auto partnerIt = findPartnerByType(partnershipType);
+        if (partnerIt != relations.end()) {
+            cout << "Found partner with " << partnershipType << " status:" << endl;
+            cout << *partnerIt << endl;
+        } else {
+            cout << "No partner with " << partnershipType << " status found." << endl;
+        }
+    }
 };
 // Template specialization for sorting sponsors by name and sponsorshipAmount and also calculate the total sponsorship amount
 template<>
@@ -711,9 +724,12 @@ void BussinessRelationship<Sponsor>::UpdateRelationsList() {
     }
     cout << "The total amount offered by sponsors is: " << sum << endl;
     cout << endl;
+
 };
 
 int main() {
+
+    ///////////////////  *  PART I of testing TEMPLATES AND SPECIALIZATION OBJ, STL find_if, sort *  ///////////////////
 
     BussinessRelationship<Sponsor> sponsorBookstore;
     sponsorBookstore.addRelation(Sponsor("ABC Company", 5000.0));
@@ -728,7 +744,6 @@ int main() {
     cout << "Sponsors:" << endl;
     sponsorBookstore.displayRelations();
     sponsorBookstore.UpdateRelationsList();
-
     cout << "Sorted Sponsors (by sponsorship amount):" << endl;
     sponsorBookstore.displayRelations();
 
@@ -736,6 +751,201 @@ int main() {
     cout << "Sorted Partners (by their name):" << endl;
     partnerBookstore.UpdateRelationsList();
     partnerBookstore.displayRelations();
+    BussinessRelationship<Partner> businessRelationship;
+
+    businessRelationship.addRelation(Partner("Partner A", "Gold"));
+    businessRelationship.addRelation(Partner("Partner B", "Silver"));
+    businessRelationship.addRelation(Partner("Partner C", "Bronze"));
+    businessRelationship.addRelation(Partner("Partner D", "Silver"));
+
+    businessRelationship.displayRelations();
+    cout << endl;
+
+    businessRelationship.printPartnerByType("Gold");
+
+    ///////////////////  *   PART II of testing  REGEX, SHARED_PTR, BUILDER PATTERN  * ///////////////////
+
+    Manager manager;
+    // Validate date using regular expression
+    regex dateRegex(R"(^\d{4}-\d{2}-\d{2}$)");
+    int numEvents;
+
+
+    cout << "Enter the number of events to create: ";
+    cin >> numEvents;
+
+    for (int i = 0; i < numEvents; i++) {
+        string name, date, location, description;
+
+        cout << "Enter details for Event " << i+1 << ":" << endl;
+
+        // Validate and read name
+        cout << "Name: ";
+        cin >> name;
+
+        // Validate and read date
+        while (true) {
+            cout << "Date (YYYY-MM-DD): ";
+            cin >> date;
+
+            if (regex_match(date, dateRegex)) {
+                break;
+            } else {
+                cout << "Invalid date format. Please enter in the format YYYY-MM-DD." << endl;
+            }
+        }
+
+        cout << "Location: ";
+        cin >> location;
+
+        cout << "Description: ";
+        cin >> description;
+
+        CampaignBuilder campaignBuilder;
+        manager.setEventBuilder(&campaignBuilder);
+        manager.constructEvent(name, date, location, description);
+    }
+
+    const vector<shared_ptr<Event>>& events = manager.getEvents();
+    cout << "\n\nEvents you've just introduced: "<< endl;
+    for (const auto& event : events) {
+        cout << *event << endl;
+    }
+
+    ////////////// * PREVIOUS MENU : UPDATE -> used unique_ptr * //////////////
+
+    string username = "";
+    string password = "";
+    int account_option;
+
+    Employee employee("", "", 5000);
+
+    Customer customer("Radu Valentin",  1);
+    cout << "\nChoose an account type:    0-Customer  |   1-Employee\n";
+    cin >> account_option;
+    if (account_option == 0) {
+        cin >> customer;
+        cout << "Please loggin to see your account details! " << endl;
+        cout << "Introduce username: " << endl;
+        cin >> username;
+        cout << "Introduce password: " << endl;
+        cin >> password;
+        if (customer.validation_input(username, password)) {
+            cout << "Authentification successfull!" << endl;
+            cout << "---Account details---" << endl;
+            cout << customer;
+            cout << "nr of orders: " << customer.getNrOrders() << endl;
+            cout << "----------------\n" << endl;
+
+            /**Downcasting:
+             * using dynamic_cast
+             * */
+            Product* prod;
+            try {
+                int buy_option;
+
+                cout << "What discount card you have?    0 - BooksExpress  ||   1 - OfficeExpress";
+                cin >> buy_option;
+
+                if (buy_option == 0)
+                    prod = new Book("The Great Gatsby", "F. Scott Fitzgerald", 200);
+                else if (buy_option == 1)
+                    prod = new OfficeSupplies("Set of pencils", 70, 20, 1);
+                else {
+                    cout << "Make sure you've introduced the correct number!" << endl;
+                    return 0;
+                }
+                cout << "Buy the book  -  1     ||    Buy the pencils   -   0";
+                cin >> buy_option;
+                if (buy_option == 1 && dynamic_cast<Book*>(prod))
+                    cout << "Congrats! You bought a book with only " << prod->calculateShippingCost() << " $" << endl;
+                else if (buy_option == 0 && dynamic_cast<OfficeSupplies*>(prod))
+                    cout << "Congrats! You bought pencils with only " << prod->calculateShippingCost() << " $" << endl;
+                else throw runtime_error("Can't buy books having OfficeExpress card and pencils having BooksExpress card!>> See you next time! ");
+            } catch (runtime_error& error) {
+                cout << error.what() << endl;
+            }
+            if (prod != NULL) {
+                delete prod;
+            }
+
+        }
+    } else if (account_option == 1) {
+        cin >> employee;
+        cout << "Please loggin to see your account details! " << endl;
+        cout << "Introduce username: " << endl;
+        cin >> username;
+        cout << "Introduce password: " << endl;
+        cin >> password;
+        if (employee.validation_input(username, password)) {
+            cout << "Authentification successfull!" << endl;
+            cout << "---Account details---" << endl;
+            cout << employee;
+            cout << "----------------\n" << endl;
+
+            account_option = -1;
+            cout << "want to add items in stock ?  1:yes || 0:no";
+            cin >> account_option;
+            if (account_option == 1) {
+                int nr_items;
+                vector<unique_ptr<Product>> products;
+                cout << "How many items you want to add? " <<  endl;
+                cin >> nr_items;
+
+                for (int i = 0; i<nr_items;i++) {
+                    int opt;
+                    cout << "Introduce: " << endl;
+                    cout << "1.Book" << endl;
+                    cout << "2.Office item" << endl;
+                    cin >> opt;
+                    switch (opt) {
+                        case 1: {
+                            string title;
+                            string author;
+                            int price;
+                            cout << "Titlu: " << endl;
+                            cin >> title;
+                            cout << "Autor: " << endl;
+                            cin >> author;
+                            cout << "price: " << endl;
+                            cin >> price;
+                            products.push_back(make_unique<Book>(title, author, price));
+                            break;
+                        }
+                        case 2: {
+                            string name;
+                            int gross_price;
+                            cout << "Name: " << endl;
+                            cin >> name;
+                            cout << "pret: " << endl;
+                            cin >> gross_price;
+                            products.push_back(make_unique<OfficeSupplies>(name, gross_price, 10, 2));
+                            break;
+                        }
+
+                    }
+                }
+
+//                for (const auto& product : products) {
+//                    if (dynamic_cast<Book*>(product)) {
+//                        cout << *dynamic_cast<Book*>(product) << endl;
+//                    } else {
+//                        cout << *dynamic_cast<OfficeSupplies*>(product) << endl;
+//                    }
+                for (const auto& product : products) {
+                    if (auto book = dynamic_cast<Book*>(product.get())) {
+                        cout << *book << endl;
+                    } else if (auto officeSupplies = dynamic_cast<OfficeSupplies*>(product.get())) {
+                        cout << *officeSupplies << endl;
+                    }
+                }
+
+                }
+            }
+
+
+        }
+
 
     return 0;
 }

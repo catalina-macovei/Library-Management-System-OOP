@@ -700,10 +700,6 @@ public:
         });
     }
 
-    bool hasPartnerByType(const string& partnershipType) {
-        return findPartnerByType(partnershipType) != relations.end();
-    }
-
     void printPartnerByType(const string& partnershipType) {
         auto partnerIt = findPartnerByType(partnershipType);
         if (partnerIt != relations.end()) {
@@ -736,11 +732,6 @@ int main() {
     sponsorBookstore.addRelation(Sponsor("XYZ Corporation", 3000.0));
     sponsorBookstore.addRelation(Sponsor("123 Enterprises", 2000.0));
 
-    BussinessRelationship<Partner> partnerBookstore;
-    partnerBookstore.addRelation(Partner("Company B", "Gold"));
-    partnerBookstore.addRelation(Partner("Company C", "Silver"));
-    partnerBookstore.addRelation(Partner("Company A", "Bronze"));
-
     cout << "Sponsors:" << endl;
     sponsorBookstore.displayRelations();
     sponsorBookstore.UpdateRelationsList();
@@ -748,28 +739,35 @@ int main() {
     sponsorBookstore.displayRelations();
 
 
-    cout << "Sorted Partners (by their name):" << endl;
-    partnerBookstore.UpdateRelationsList();
-    partnerBookstore.displayRelations();
     BussinessRelationship<Partner> businessRelationship;
+    string partner_type = "";
+    bool part_option;
 
     businessRelationship.addRelation(Partner("Partner A", "Gold"));
     businessRelationship.addRelation(Partner("Partner B", "Silver"));
     businessRelationship.addRelation(Partner("Partner C", "Bronze"));
     businessRelationship.addRelation(Partner("Partner D", "Silver"));
 
+    cout << "Here are the partners: " << endl;
     businessRelationship.displayRelations();
     cout << endl;
+    cout << "Want to search for a partner in the list ?  1-YES   0-NO";
+    cin >> part_option;
+    if (part_option) {
+        cout << "\nIntroduce a partnership type:  " << endl;
+        cout << "Gold \n" << "Silver\n" << "Bronze" <<  endl;
+        cin >> partner_type;
+        businessRelationship.printPartnerByType(partner_type);
+    } else if(!part_option) {
+        cout << "Bye, hope you'll try this next time!" << endl;
+    }
 
-    businessRelationship.printPartnerByType("Gold");
 
     ///////////////////  *   PART II of testing  REGEX, SHARED_PTR, BUILDER PATTERN  * ///////////////////
 
     Manager manager;
-    // Validate date using regular expression
-    regex dateRegex(R"(^\d{4}-\d{2}-\d{2}$)");
+    regex dateRegex(R"(^\d{4}-\d{2}-\d{2}$)");   // Validate date using regular expression
     int numEvents;
-
 
     cout << "Enter the number of events to create: ";
     cin >> numEvents;
@@ -778,13 +776,10 @@ int main() {
         string name, date, location, description;
 
         cout << "Enter details for Event " << i+1 << ":" << endl;
-
-        // Validate and read name
         cout << "Name: ";
         cin >> name;
 
-        // Validate and read date
-        while (true) {
+        while (true) {    // Validate and read date
             cout << "Date (YYYY-MM-DD): ";
             cin >> date;
 
@@ -794,10 +789,8 @@ int main() {
                 cout << "Invalid date format. Please enter in the format YYYY-MM-DD." << endl;
             }
         }
-
         cout << "Location: ";
         cin >> location;
-
         cout << "Description: ";
         cin >> description;
 
@@ -820,132 +813,63 @@ int main() {
 
     Employee employee("", "", 5000);
 
-    Customer customer("Radu Valentin",  1);
-    cout << "\nChoose an account type:    0-Customer  |   1-Employee\n";
-    cin >> account_option;
-    if (account_option == 0) {
-        cin >> customer;
-        cout << "Please loggin to see your account details! " << endl;
-        cout << "Introduce username: " << endl;
-        cin >> username;
-        cout << "Introduce password: " << endl;
-        cin >> password;
-        if (customer.validation_input(username, password)) {
-            cout << "Authentification successfull!" << endl;
-            cout << "---Account details---" << endl;
-            cout << customer;
-            cout << "nr of orders: " << customer.getNrOrders() << endl;
-            cout << "----------------\n" << endl;
+    cin >> employee;
+    cout << "Please loggin to see your account details! " << endl;
+    cout << "Introduce username: " << endl;
+    cin >> username;
+    cout << "Introduce password: " << endl;
+    cin >> password;
+    if (employee.validation_input(username, password)) {
+        cout << "Authentification successfull!" << endl;
+        cout << "---Account details---" << endl;
+        cout << employee;
+        cout << "----------------\n" << endl;
 
-            /**Downcasting:
-             * using dynamic_cast
-             * */
-            Product* prod;
-            try {
-                int buy_option;
+        cout << "want to add items in stock ?  1:yes || 0:no";
+        cin >> account_option;
+        if (account_option == 1) {
+            int nr_items;
+            vector<unique_ptr<Product>> products;
+            cout << "How many items you want to add? " <<  endl;
+            cin >> nr_items;
 
-                cout << "What discount card you have?    0 - BooksExpress  ||   1 - OfficeExpress";
-                cin >> buy_option;
-
-                if (buy_option == 0)
-                    prod = new Book("The Great Gatsby", "F. Scott Fitzgerald", 200);
-                else if (buy_option == 1)
-                    prod = new OfficeSupplies("Set of pencils", 70, 20, 1);
-                else {
-                    cout << "Make sure you've introduced the correct number!" << endl;
-                    return 0;
-                }
-                cout << "Buy the book  -  1     ||    Buy the pencils   -   0";
-                cin >> buy_option;
-                if (buy_option == 1 && dynamic_cast<Book*>(prod))
-                    cout << "Congrats! You bought a book with only " << prod->calculateShippingCost() << " $" << endl;
-                else if (buy_option == 0 && dynamic_cast<OfficeSupplies*>(prod))
-                    cout << "Congrats! You bought pencils with only " << prod->calculateShippingCost() << " $" << endl;
-                else throw runtime_error("Can't buy books having OfficeExpress card and pencils having BooksExpress card!>> See you next time! ");
-            } catch (runtime_error& error) {
-                cout << error.what() << endl;
-            }
-            if (prod != NULL) {
-                delete prod;
-            }
-
-        }
-    } else if (account_option == 1) {
-        cin >> employee;
-        cout << "Please loggin to see your account details! " << endl;
-        cout << "Introduce username: " << endl;
-        cin >> username;
-        cout << "Introduce password: " << endl;
-        cin >> password;
-        if (employee.validation_input(username, password)) {
-            cout << "Authentification successfull!" << endl;
-            cout << "---Account details---" << endl;
-            cout << employee;
-            cout << "----------------\n" << endl;
-
-            account_option = -1;
-            cout << "want to add items in stock ?  1:yes || 0:no";
-            cin >> account_option;
-            if (account_option == 1) {
-                int nr_items;
-                vector<unique_ptr<Product>> products;
-                cout << "How many items you want to add? " <<  endl;
-                cin >> nr_items;
-
-                for (int i = 0; i<nr_items;i++) {
-                    int opt;
-                    cout << "Introduce: " << endl;
-                    cout << "1.Book" << endl;
-                    cout << "2.Office item" << endl;
-                    cin >> opt;
-                    switch (opt) {
-                        case 1: {
-                            string title;
-                            string author;
-                            int price;
-                            cout << "Titlu: " << endl;
-                            cin >> title;
-                            cout << "Autor: " << endl;
-                            cin >> author;
-                            cout << "price: " << endl;
-                            cin >> price;
-                            products.push_back(make_unique<Book>(title, author, price));
-                            break;
+            for (int i = 0; i<nr_items;i++) {
+                int opt;
+                cout << "Introduce: " << endl;
+                cout << "1.Book" << endl;
+                cout << "2.Office item" << endl;
+                cin >> opt;
+                switch (opt) {
+                    case 1: {
+                        string title;string author;int price;cout << "Titlu: " << endl;cin >> title;cout << "Autor: " << endl;cin >> author;
+                        cout << "price: " << endl;
+                        cin >> price;
+                        products.push_back(make_unique<Book>(title, author, price));
+                        break;
                         }
-                        case 2: {
-                            string name;
-                            int gross_price;
-                            cout << "Name: " << endl;
-                            cin >> name;
-                            cout << "pret: " << endl;
-                            cin >> gross_price;
-                            products.push_back(make_unique<OfficeSupplies>(name, gross_price, 10, 2));
-                            break;
+                    case 2: {
+                         string name;
+                         int gross_price;
+                         cout << "Name: " << endl;
+                         cin >> name;
+                         cout << "pret: " << endl;
+                         cin >> gross_price;
+                         products.push_back(make_unique<OfficeSupplies>(name, gross_price, 10, 2));
+                         break;
                         }
-
                     }
                 }
-
-//                for (const auto& product : products) {
-//                    if (dynamic_cast<Book*>(product)) {
-//                        cout << *dynamic_cast<Book*>(product) << endl;
-//                    } else {
-//                        cout << *dynamic_cast<OfficeSupplies*>(product) << endl;
-//                    }
                 for (const auto& product : products) {
                     if (auto book = dynamic_cast<Book*>(product.get())) {
                         cout << *book << endl;
-                    } else if (auto officeSupplies = dynamic_cast<OfficeSupplies*>(product.get())) {
+                        } else if (auto officeSupplies = dynamic_cast<OfficeSupplies*>(product.get())) {
                         cout << *officeSupplies << endl;
+                        }
                     }
-                }
-
-                }
+                } else if(account_option == 0) {
+                        cout << "Thank you for your time! Bye!" << endl;
+                        return 0;
+                     }
             }
-
-
-        }
-
-
     return 0;
 }
